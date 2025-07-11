@@ -1,4 +1,4 @@
-package com.youngineer.backend.dto.requests;
+package com.youngineer.backend.dto.responses;
 
 public record UserQuizDto() {
 }

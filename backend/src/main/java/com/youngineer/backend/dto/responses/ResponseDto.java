@@ -1,4 +1,15 @@
 package com.youngineer.backend.dto.responses;
 
-public class ResponseDto {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record ResponseDto(
+        @NotNull
+        @NotBlank
+        String message,
+
+        @NotNull
+        @NotBlank
+        Object content
+) {
 }
