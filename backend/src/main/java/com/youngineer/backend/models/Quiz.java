@@ -1,12 +1,15 @@
 package com.youngineer.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "quizzes")
+@Table(name = "quiz")
 public class Quiz {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,12 +25,67 @@ public class Quiz {
     private Timestamp updatedAt;
 
     @ManyToOne
+    @PrimaryKeyJoinColumn(name = "user_id")
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL)
-    private List<Question> questions;
+    @JsonManagedReference
+    private List<Question> questions = new ArrayList<>();
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL)
-    private List<QuizResult> quizResults;
+    @JsonManagedReference
+    private List<QuizResult> quizResults = new ArrayList<>();
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
+
+    public List<QuizResult> getQuizResults() {
+        return quizResults;
+    }
+
+    public void setQuizResults(List<QuizResult> quizResults) {
+        this.quizResults = quizResults;
+    }
 }

@@ -1,8 +1,9 @@
 package com.youngineer.backend.controllers;
 
+import com.youngineer.backend.dto.requests.UserLoginRequest;
 import com.youngineer.backend.dto.requests.UserSignUpRequest;
 import com.youngineer.backend.dto.responses.ResponseDto;
-import com.youngineer.backend.services.UserService;
+import com.youngineer.backend.services.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,14 +14,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/signup")
-    public ResponseDto userSignUp(@Valid @RequestBody UserSignUpRequest userSignUpRequest) {
-        return userService.saveUser(userSignUpRequest);
+    public ResponseDto userSignUp(@Valid @RequestBody UserSignUpRequest signUpRequest) {
+        return authService.userSignup(signUpRequest);
+    }
+
+    @PostMapping("/login")
+    public ResponseDto userLogin(@Valid @RequestBody UserLoginRequest loginRequest) {
+        return authService.userLogin(loginRequest);
     }
 }

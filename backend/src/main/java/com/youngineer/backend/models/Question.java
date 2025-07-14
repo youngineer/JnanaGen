@@ -1,12 +1,14 @@
 package com.youngineer.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
-import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "questions")
+@Table(name = "question")
 public class Question {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,18 +18,52 @@ public class Question {
     @Column(name = "question_text")
     private String questionText;
 
-    @Column(name = "question_type")
-    private String questionType;
-
-    @Column(name = "created_at")
-    private Timestamp createdAt;
-    @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    @Column(name = "correct_option")
+    private String correctOption;
 
     @ManyToOne
     @JoinColumn(name = "quiz_id")
+    @JsonBackReference
     private Quiz quiz;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    private List<Option> options;
+    @JsonManagedReference
+    private List<Option> options = new ArrayList<>();
+
+    public Long getId() {
+        return id;
+    }
+
+
+    public String getQuestionText() {
+        return questionText;
+    }
+
+    public void setQuestionText(String questionText) {
+        this.questionText = questionText;
+    }
+
+    public String getCorrectAns() {
+        return correctOption;
+    }
+
+    public void setCorrectAns(String correctAns) {
+        this.correctOption = correctAns;
+    }
+
+    public Quiz getQuiz() {
+        return quiz;
+    }
+
+    public void setQuiz(Quiz quiz) {
+        this.quiz = quiz;
+    }
+
+    public List<Option> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<Option> options) {
+        this.options = options;
+    }
 }

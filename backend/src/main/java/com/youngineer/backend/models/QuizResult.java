@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "quiz_results")
+@Table(name = "quiz_result")
 public class QuizResult {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +31,27 @@ public class QuizResult {
     private Timestamp createdAt;
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public Timestamp getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(Timestamp completedAt) {
+        this.completedAt = completedAt;
+    }
+
+    public Integer getTotalQuestions() {
+        return totalQuestions;
+    }
+
+    public void setTotalQuestions(Integer totalQuestions) {
+        this.totalQuestions = totalQuestions;
+    }
 
     public Integer getScore() {
         return score;

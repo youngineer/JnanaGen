@@ -1,4 +1,17 @@
 package com.youngineer.backend.dto.responses;
 
-public record UserQuizDto() {
+import org.springframework.lang.NonNull;
+
+import java.util.List;
+
+public record QuizDto(
+        @NonNull
+        Long id,
+
+        @NonNull
+        String title,
+
+        @NonNull
+        List<QuestionDto> questions
+) {
 }

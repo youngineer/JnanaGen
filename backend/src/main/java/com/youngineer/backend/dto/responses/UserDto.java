@@ -1,4 +1,4 @@
-package com.youngineer.backend.dto.requests;
+package com.youngineer.backend.dto.responses;
 
 import com.youngineer.backend.models.Quiz;
 import com.youngineer.backend.models.QuizResult;
@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record UserDto(
+        Long id,
         @NotNull
         @NotBlank
         String name,

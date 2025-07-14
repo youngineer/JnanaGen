@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public interface UserService {
+public interface AuthService {
     ResponseDto userSignup(UserSignUpRequest userSignUpRequest);
     ResponseDto userLogin(UserLoginRequest userLoginRequest);
 }

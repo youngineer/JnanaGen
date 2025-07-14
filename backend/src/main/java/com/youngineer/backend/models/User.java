@@ -1,17 +1,22 @@
 package com.youngineer.backend.models;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.youngineer.backend.dto.requests.UserSignUpRequest;
+import com.youngineer.backend.dto.responses.UserDto;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name = "\"user\"")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "name")
@@ -29,10 +34,17 @@ public class User {
     private Timestamp updatedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Quiz> quizzes;
+    @JsonManagedReference
+    private List<Quiz> quizzes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<QuizResult> quizResults;
+    @JsonManagedReference
+    private List<QuizResult> quizResults = new ArrayList<>();
+
+
+    public Long getId() {
+        return id;
+    }
 
     public Timestamp getCreatedAt() {
         return createdAt;

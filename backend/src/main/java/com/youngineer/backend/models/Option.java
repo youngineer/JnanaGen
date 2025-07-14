@@ -1,11 +1,13 @@
 package com.youngineer.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.youngineer.backend.dto.responses.OptionDto;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "options")
+@Table(name = "option")
 public class Option {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,16 +17,30 @@ public class Option {
     @Column(name = "option_text")
     private String optionText;
 
-    @Column(name = "is_correct")
-    private Boolean isCorrect;
-
-    @Column(name = "created_at")
-    private Timestamp createdAt;
-    @Column(name = "updated_at")
-    private Timestamp updatedAt;;
-
     @ManyToOne
     @JoinColumn(name = "question_id")
+    @JsonBackReference
     private Question question;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getOptionText() {
+        return optionText;
+    }
+
+    public void setOptionText(String optionText) {
+        this.optionText = optionText;
+    }
+
+    public Question getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
+
 }
 

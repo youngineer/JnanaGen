@@ -1,4 +1,13 @@
 package com.youngineer.backend.dto.responses;
 
-public record OptionDto() {
+import org.springframework.lang.NonNull;
+
+public record OptionDto(
+
+        @NonNull
+        Long id,
+
+        @NonNull
+        String option
+) {
 }

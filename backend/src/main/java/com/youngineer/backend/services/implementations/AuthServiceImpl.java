@@ -1,13 +1,14 @@
 package com.youngineer.backend.services.implementations;
 
-import com.youngineer.backend.dto.requests.UserDto;
+import com.youngineer.backend.dto.responses.UserDto;
 import com.youngineer.backend.dto.requests.UserLoginRequest;
 import com.youngineer.backend.dto.requests.UserSignUpRequest;
 import com.youngineer.backend.dto.responses.ResponseDto;
 import com.youngineer.backend.models.User;
 import com.youngineer.backend.repository.UserRepository;
-import com.youngineer.backend.services.UserService;
+import com.youngineer.backend.services.AuthService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -15,12 +16,13 @@ import java.util.Optional;
 
 
 @Service
-public class UserServiceImpl implements UserService {
+@Transactional
+public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private static final String SUCCESS_MESSAGE = "OK";
 
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public AuthServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -33,7 +35,7 @@ public class UserServiceImpl implements UserService {
         String requestEmailId = userSignUpRequest.emailId();
 
         try {
-            if (!userRepository.existsByEmailId(requestEmailId)) {
+            if (Boolean.FALSE.equals(userRepository.existsByEmailId(requestEmailId))) {
                 User user = convertToUserEntity(userSignUpRequest);
                 User savedUser = userRepository.save(user);
                 UserDto savedUserDto = convertToUserDto(savedUser);
@@ -65,7 +67,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserDto convertToUserDto(User user) {
-        return new UserDto(user.getName(), user.getEmailId(), user.getQuizzes(), user.getQuizResults());
+        return new UserDto(user.getId(), user.getName(), user.getEmailId(), user.getQuizzes(), user.getQuizResults());
     }
 
     private User convertToUserEntity(UserSignUpRequest userSignUpRequest) {
@@ -79,8 +81,8 @@ public class UserServiceImpl implements UserService {
         user.setCreatedAt(currentTimeStamp);
         user.setUpdatedAt(currentTimeStamp);
 
-        user.setQuizzes(new ArrayList<>());
-        user.setQuizResults(new ArrayList<>());
+//        user.setQuizzes(new ArrayList<>());
+//        user.setQuizResults(new ArrayList<>());
 
         return user;
     }

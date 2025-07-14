@@ -1,4 +1,9 @@
 package com.youngineer.backend.dto.responses;
 
-public record UserQuizResultDto() {
+import jakarta.validation.constraints.NotNull;
+
+public record UserQuizResultResponse(
+        @NotNull
+        Integer score
+) {
 }

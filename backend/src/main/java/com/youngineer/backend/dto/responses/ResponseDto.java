@@ -8,7 +8,6 @@ public record ResponseDto(
         @NotBlank
         String message,
 
-        @NotNull
         @NotBlank
         Object content
 ) {
