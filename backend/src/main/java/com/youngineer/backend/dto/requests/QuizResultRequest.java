@@ -2,17 +2,17 @@ package com.youngineer.backend.dto.requests;
 
 import org.springframework.lang.NonNull;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
-public record UserQuizResultRequest(
+public record QuizResultRequest(
         @NonNull
         Long quizId,
 
         @NonNull
-        HashMap<Long, Long> questionOptionMap,
+        LinkedHashMap<Long, Long> questionOptionMap,
 
         @NonNull
-        List<String> answerOptionList
+        List<String> userAnswerList
 ) {
 }

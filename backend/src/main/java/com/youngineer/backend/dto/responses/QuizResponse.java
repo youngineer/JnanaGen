@@ -4,7 +4,7 @@ import org.springframework.lang.NonNull;
 
 import java.util.List;
 
-public record QuizDto(
+public record QuizResponse(
         @NonNull
         Long id,
 

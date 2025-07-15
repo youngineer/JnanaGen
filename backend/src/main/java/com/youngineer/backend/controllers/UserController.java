@@ -2,10 +2,10 @@ package com.youngineer.backend.controllers;
 
 
 import com.youngineer.backend.dto.requests.QuizRequest;
+import com.youngineer.backend.dto.requests.QuizResultRequest;
 import com.youngineer.backend.dto.responses.ResponseDto;
 import com.youngineer.backend.services.QuizService;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,5 +24,10 @@ public class UserController {
     @PostMapping("/generateQuiz")
     public ResponseDto generateQuiz(@Valid @RequestBody QuizRequest quizRequest) {
         return quizService.generateQuiz(quizRequest);
+    }
+
+    @PostMapping("/calculateScore")
+    public ResponseDto getQuizResult(@Valid @RequestBody QuizResultRequest request) {
+        return quizService.calculateScore(request);
     }
 }

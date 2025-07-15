@@ -66,4 +66,15 @@ public class Question {
     public void setOptions(List<Option> options) {
         this.options = options;
     }
+
+    @Override
+    public String toString() {
+        return "Question{" +
+                "id=" + id +
+                ", questionText='" + questionText + '\'' +
+                ", correctOption='" + correctOption + '\'' +
+                ", quiz=" + quiz +
+                ", options=" + options +
+                '}';
+    }
 }

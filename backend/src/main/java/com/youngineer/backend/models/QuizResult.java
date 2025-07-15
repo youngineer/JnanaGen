@@ -13,52 +13,108 @@ public class QuizResult {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "quiz_id")
+    @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "score")
-    private Integer score;
-    @Column(name = "total_questions")
-    private Integer totalQuestions;
+    @ManyToOne
+    @JoinColumn(name = "question_id", nullable = false)
+    private Question question;
 
-    @Column(name = "completed_at")
-    private Timestamp completedAt;
-    @Column(name = "created_at")
+    @ManyToOne
+    @JoinColumn(name = "selected_option_id", nullable = true)
+    private Option selectedOption;
+
+    @Column(name = "is_correct", nullable = false)
+    private boolean isCorrect;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
-    @Column(name = "updated_at")
+
+    @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt;
 
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public Timestamp getCompletedAt() {
-        return completedAt;
+    public void setId(long id) {
+        this.id = id;
     }
 
-    public void setCompletedAt(Timestamp completedAt) {
-        this.completedAt = completedAt;
+    public Quiz getQuiz() {
+        return quiz;
     }
 
-    public Integer getTotalQuestions() {
-        return totalQuestions;
+    public void setQuiz(Quiz quiz) {
+        this.quiz = quiz;
     }
 
-    public void setTotalQuestions(Integer totalQuestions) {
-        this.totalQuestions = totalQuestions;
+    public User getUser() {
+        return user;
     }
 
-    public Integer getScore() {
-        return score;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public void setScore(Integer score) {
-        this.score = score;
+    public Question getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
+
+    public Option getSelectedOption() {
+        return selectedOption;
+    }
+
+    public void setSelectedOption(Option selectedOption) {
+        this.selectedOption = selectedOption;
+    }
+
+    public boolean isCorrect() {
+        return isCorrect;
+    }
+
+    public void setCorrect(boolean correct) {
+        isCorrect = correct;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+
+    @Override
+    public String toString() {
+        return "QuizResult{" +
+                "id=" + id +
+                ", quiz=" + quiz +
+                ", user=" + user +
+                ", question=" + question +
+                ", selectedOption=" + selectedOption +
+                ", isCorrect=" + isCorrect +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }
 

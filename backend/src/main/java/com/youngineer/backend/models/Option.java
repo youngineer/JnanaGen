@@ -42,5 +42,13 @@ public class Option {
         this.question = question;
     }
 
+    @Override
+    public String toString() {
+        return "Option{" +
+                "id=" + id +
+                ", optionText='" + optionText + '\'' +
+                ", question=" + question +
+                '}';
+    }
 }
 

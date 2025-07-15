@@ -88,4 +88,17 @@ public class Quiz {
     public void setQuizResults(List<QuizResult> quizResults) {
         this.quizResults = quizResults;
     }
+
+    @Override
+    public String toString() {
+        return "Quiz{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", user=" + user +
+                ", questions=" + questions +
+                ", quizResults=" + quizResults +
+                '}';
+    }
 }

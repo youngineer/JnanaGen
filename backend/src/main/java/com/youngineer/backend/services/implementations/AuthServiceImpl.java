@@ -1,8 +1,8 @@
 package com.youngineer.backend.services.implementations;
 
 import com.youngineer.backend.dto.responses.UserDto;
-import com.youngineer.backend.dto.requests.UserLoginRequest;
-import com.youngineer.backend.dto.requests.UserSignUpRequest;
+import com.youngineer.backend.dto.requests.LoginRequest;
+import com.youngineer.backend.dto.requests.SignUpRequest;
 import com.youngineer.backend.dto.responses.ResponseDto;
 import com.youngineer.backend.models.User;
 import com.youngineer.backend.repository.UserRepository;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Optional;
 
 
@@ -27,16 +26,16 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseDto userSignup(UserSignUpRequest userSignUpRequest) {
-        if (userSignUpRequest == null) {
+    public ResponseDto userSignup(SignUpRequest signUpRequest) {
+        if (signUpRequest == null) {
             return new ResponseDto("Invalid user data", null);
         }
 
-        String requestEmailId = userSignUpRequest.emailId();
+        String requestEmailId = signUpRequest.emailId();
 
         try {
             if (Boolean.FALSE.equals(userRepository.existsByEmailId(requestEmailId))) {
-                User user = convertToUserEntity(userSignUpRequest);
+                User user = convertToUserEntity(signUpRequest);
                 User savedUser = userRepository.save(user);
                 UserDto savedUserDto = convertToUserDto(savedUser);
                 return new ResponseDto("OK", savedUserDto);
@@ -50,9 +49,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseDto userLogin(UserLoginRequest userLoginRequest) {
-        String emailId = userLoginRequest.emailId().trim();
-        String userPassword = userLoginRequest.password();
+    public ResponseDto userLogin(LoginRequest loginRequest) {
+        String emailId = loginRequest.emailId().trim();
+        String userPassword = loginRequest.password();
         try {
             Optional<User> userOptional = userRepository.findByEmailId(emailId);
             if(userOptional.isEmpty()) throw new Exception("email id not registered");
@@ -70,12 +69,12 @@ public class AuthServiceImpl implements AuthService {
         return new UserDto(user.getId(), user.getName(), user.getEmailId(), user.getQuizzes(), user.getQuizResults());
     }
 
-    private User convertToUserEntity(UserSignUpRequest userSignUpRequest) {
+    private User convertToUserEntity(SignUpRequest signUpRequest) {
         User user = new User();
 
-        user.setName(userSignUpRequest.name());
-        user.setEmailId(userSignUpRequest.emailId());
-        user.setPassword(userSignUpRequest.password());
+        user.setName(signUpRequest.name());
+        user.setEmailId(signUpRequest.emailId());
+        user.setPassword(signUpRequest.password());
 
         Timestamp currentTimeStamp = new Timestamp(System.currentTimeMillis());
         user.setCreatedAt(currentTimeStamp);

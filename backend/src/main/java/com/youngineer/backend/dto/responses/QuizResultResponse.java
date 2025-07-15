@@ -1,9 +1,13 @@
 package com.youngineer.backend.dto.responses;
+import org.springframework.lang.NonNull;
 
-import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
-public record UserQuizResultResponse(
-        @NotNull
-        Integer score
+public record QuizResultResponse(
+        @NonNull
+        Integer score,
+
+        @NonNull
+        List<String> correctAnswerList
 ) {
 }

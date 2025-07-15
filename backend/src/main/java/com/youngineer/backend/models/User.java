@@ -2,8 +2,6 @@ package com.youngineer.backend.models;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.youngineer.backend.dto.requests.UserSignUpRequest;
-import com.youngineer.backend.dto.responses.UserDto;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;

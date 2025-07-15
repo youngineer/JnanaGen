@@ -1,13 +1,13 @@
 package com.youngineer.backend.services;
 
-import com.youngineer.backend.dto.requests.UserLoginRequest;
-import com.youngineer.backend.dto.requests.UserSignUpRequest;
+import com.youngineer.backend.dto.requests.LoginRequest;
+import com.youngineer.backend.dto.requests.SignUpRequest;
 import com.youngineer.backend.dto.responses.ResponseDto;
 import org.springframework.stereotype.Service;
 
 
 @Service
 public interface AuthService {
-    ResponseDto userSignup(UserSignUpRequest userSignUpRequest);
-    ResponseDto userLogin(UserLoginRequest userLoginRequest);
+    ResponseDto userSignup(SignUpRequest signUpRequest);
+    ResponseDto userLogin(LoginRequest loginRequest);
 }
