@@ -1,4 +1,9 @@
 package com.youngineer.backend.dto.requests;
 
-public record UserIdRequest() {
+import org.springframework.lang.NonNull;
+
+public record UserIdRequest(
+        @NonNull
+        Long userId
+) {
 }

@@ -1,7 +1,6 @@
 package com.youngineer.backend.repository;
 
 import com.youngineer.backend.models.User;
-import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

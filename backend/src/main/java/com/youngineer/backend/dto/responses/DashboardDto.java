@@ -1,13 +1,13 @@
 package com.youngineer.backend.dto.responses;
 
 import com.youngineer.backend.models.Quiz;
-import com.youngineer.backend.models.QuizResult;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
-public record UserDto(
+public record DashboardDto(
         Long id,
         @NotNull
         @NotBlank
@@ -17,7 +17,6 @@ public record UserDto(
         @NotBlank
         String emailId,
 
-        List<Quiz> userQuizzes,
-        List<QuizResult> userQuizResults
+        LinkedHashMap<Long, UserQuizDetails> userQuizzes
 ) {
 }

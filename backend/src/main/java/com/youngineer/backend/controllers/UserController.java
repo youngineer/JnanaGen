@@ -1,8 +1,10 @@
 package com.youngineer.backend.controllers;
 
 
+import com.youngineer.backend.dto.requests.QuizInfo;
 import com.youngineer.backend.dto.requests.QuizRequest;
 import com.youngineer.backend.dto.requests.QuizResultRequest;
+import com.youngineer.backend.dto.requests.UserIdRequest;
 import com.youngineer.backend.dto.responses.ResponseDto;
 import com.youngineer.backend.services.QuizService;
 import jakarta.validation.Valid;
@@ -30,4 +32,15 @@ public class UserController {
     public ResponseDto getQuizResult(@Valid @RequestBody QuizResultRequest request) {
         return quizService.calculateScore(request);
     }
+
+    @PostMapping("/getQuizInfo")
+    public ResponseDto getQuizResult(@Valid @RequestBody QuizInfo request) {
+        return quizService.getQuizInfo(request);
+    }
+
+    @PostMapping("/getUserDashboardData")
+    public ResponseDto getUserDashboardData(@Valid @RequestBody UserIdRequest request) {
+        return quizService.getUserQuizDetails(request.userId());
+    }
+
 }

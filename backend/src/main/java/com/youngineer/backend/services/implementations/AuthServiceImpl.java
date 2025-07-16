@@ -1,6 +1,5 @@
 package com.youngineer.backend.services.implementations;
 
-import com.youngineer.backend.dto.responses.UserDto;
 import com.youngineer.backend.dto.requests.LoginRequest;
 import com.youngineer.backend.dto.requests.SignUpRequest;
 import com.youngineer.backend.dto.responses.ResponseDto;
@@ -36,9 +35,8 @@ public class AuthServiceImpl implements AuthService {
         try {
             if (Boolean.FALSE.equals(userRepository.existsByEmailId(requestEmailId))) {
                 User user = convertToUserEntity(signUpRequest);
-                User savedUser = userRepository.save(user);
-                UserDto savedUserDto = convertToUserDto(savedUser);
-                return new ResponseDto("OK", savedUserDto);
+                userRepository.save(user);
+                return new ResponseDto("OK", null);
             } else {
                 return new ResponseDto("Email already registered", null);
             }
@@ -65,10 +63,6 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    private UserDto convertToUserDto(User user) {
-        return new UserDto(user.getId(), user.getName(), user.getEmailId(), user.getQuizzes(), user.getQuizResults());
-    }
-
     private User convertToUserEntity(SignUpRequest signUpRequest) {
         User user = new User();
 
@@ -79,9 +73,6 @@ public class AuthServiceImpl implements AuthService {
         Timestamp currentTimeStamp = new Timestamp(System.currentTimeMillis());
         user.setCreatedAt(currentTimeStamp);
         user.setUpdatedAt(currentTimeStamp);
-
-//        user.setQuizzes(new ArrayList<>());
-//        user.setQuizResults(new ArrayList<>());
 
         return user;
     }

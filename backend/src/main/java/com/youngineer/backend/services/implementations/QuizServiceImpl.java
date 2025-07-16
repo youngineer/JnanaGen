@@ -1,11 +1,11 @@
 package com.youngineer.backend.services.implementations;
 
+import com.youngineer.backend.dto.requests.QuizInfo;
 import com.youngineer.backend.dto.requests.QuizRequest;
 import com.youngineer.backend.dto.requests.QuizResultRequest;
 import com.youngineer.backend.dto.responses.*;
 import com.youngineer.backend.models.*;
 import com.youngineer.backend.repository.*;
-import com.youngineer.backend.services.ChatService;
 import com.youngineer.backend.services.QuizService;
 import com.youngineer.backend.utils.Constants;
 import jakarta.persistence.EntityNotFoundException;
@@ -14,11 +14,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.util.Pair;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -27,7 +28,6 @@ import java.util.*;
 public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final OptionRepository optionRepository;
-    private final ChatService chatService;
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
     private final QuizResultRepository quizResultRepository;
@@ -40,10 +40,9 @@ public class QuizServiceImpl implements QuizService {
     private final String model = "deepseek/deepseek-chat-v3-0324:free";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(QuizServiceImpl.class);
 
-    public QuizServiceImpl(ChatService chatService, QuizResultRepository quizResultRepository, Constants constants, AIServiceImpl aiService, QuizRepository quizRepository, OptionRepository optionRepository, UserRepository userRepository, QuestionRepository questionRepository) {
+    public QuizServiceImpl(QuizResultRepository quizResultRepository, Constants constants, AIServiceImpl aiService, QuizRepository quizRepository, OptionRepository optionRepository, UserRepository userRepository, QuestionRepository questionRepository) {
         this.quizRepository = quizRepository;
         this.optionRepository = optionRepository;
-        this.chatService = chatService;
         this.userRepository = userRepository;
         this.aiService = aiService;
         this.questionRepository = questionRepository;
@@ -66,69 +65,6 @@ public class QuizServiceImpl implements QuizService {
             return new ResponseDto("OK", quizDto);
         } catch (Exception e) {
             return new ResponseDto("Error creating user: " + e, null);
-        }
-    }
-
-
-    @Override
-    @Transactional
-    public ResponseDto calculateScore(QuizResultRequest request) {
-        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        Long userId = 1L;
-        Long quizId = request.quizId();
-        LinkedHashMap<Long, Long> questionOptionMap = request.questionOptionMap();
-        LinkedHashMap<Long, AnswerEvaluation> questionIsCorrect = new LinkedHashMap<>();
-        System.out.println(request.toString());
-
-        int score = 0;
-        int totalQuestions = questionOptionMap.size();
-
-        try {
-            Quiz quiz = quizRepository.findById(quizId)
-                    .orElseThrow(() -> new EntityNotFoundException("Quiz not found with ID: " + quizId));
-
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
-
-            for (Map.Entry<Long, Long> entry : questionOptionMap.entrySet()) {
-                Long questionId = entry.getKey();
-                Long optionId = entry.getValue();
-
-                Question question = questionRepository.findById(questionId)
-                        .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
-
-                Option option = optionRepository.findById(optionId)
-                        .orElseThrow(() -> new EntityNotFoundException("Option not found with ID: " + optionId));
-
-                String correctAnswer = question.getCorrectAns();
-                String userAnswer = option.getOptionText();
-                boolean isCorrect = userAnswer.equals(correctAnswer);
-
-                if (isCorrect) score++;
-
-                questionIsCorrect.put(questionId, new AnswerEvaluation(isCorrect, correctAnswer));
-
-                QuizResult quizResult = new QuizResult();
-                quizResult.setUser(user);
-                quizResult.setQuiz(quiz);
-                quizResult.setQuestion(question);
-                quizResult.setSelectedOption(option);
-                quizResult.setCorrect(isCorrect);
-                quizResult.setCreatedAt(currentTime);
-                quizResult.setUpdatedAt(currentTime);
-
-                quizResultRepository.save(quizResult);
-            }
-
-            HashMap<String, Object> responseMap = new HashMap<>();
-            responseMap.put("score", score);
-            responseMap.put("totalQuestions", totalQuestions);
-            responseMap.put("resultAnalysis", questionIsCorrect);
-
-            return new ResponseDto("OK", responseMap);
-
-        } catch (Exception e) {
-            return new ResponseDto("Error calculating score: " + e.getMessage(), null);
         }
     }
 
@@ -187,6 +123,141 @@ public class QuizServiceImpl implements QuizService {
     }
 
 
+    @Override
+    @Transactional
+    public ResponseDto calculateScore(QuizResultRequest request) {
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        Long userId = 1L; // TODO: Replace with authenticated user ID
+        Long quizId = request.quizId();
+        LinkedHashMap<Long, Long> userAnswersMap = request.questionOptionMap();
+        LinkedHashMap<Long, AnswerEvaluation> evaluationMap = new LinkedHashMap<>();
+
+        try {
+            Quiz quiz = quizRepository.findById(quizId)
+                    .orElseThrow(() -> new EntityNotFoundException("Quiz not found with ID: " + quizId));
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+            for (Map.Entry<Long, Long> entry : userAnswersMap.entrySet()) {
+                Long questionId = entry.getKey();
+                Long selectedOptionId = entry.getValue();
+
+                Question question = questionRepository.findById(questionId)
+                        .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
+
+                Option selectedOption = optionRepository.findById(selectedOptionId)
+                        .orElseThrow(() -> new EntityNotFoundException("Option not found with ID: " + selectedOptionId));
+
+                String correctAnswerText = question.getCorrectAns();
+                String userAnswerText = selectedOption.getOptionText();
+                boolean isCorrect = userAnswerText.equals(correctAnswerText);
+
+                QuizResult quizResult = new QuizResult();
+                quizResult.setUser(user);
+                quizResult.setQuiz(quiz);
+                quizResult.setQuestion(question);
+                quizResult.setSelectedOption(selectedOption);
+                quizResult.setCorrect(isCorrect);
+                quizResult.setCreatedAt(currentTime);
+                quizResult.setUpdatedAt(currentTime);
+                quizResultRepository.save(quizResult);
+            }
+
+            return getResult(user, quiz);
+
+        } catch (Exception ex) {
+            return new ResponseDto("Error calculating score: " + ex.getMessage(), null);
+        }
+    }
+
+
+    public ResponseDto getQuizInfo(QuizInfo request) {
+        Long userId = request.userId();
+        Long quizId = request.quizId();
+
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+            Quiz quiz = quizRepository.findById(quizId)
+                    .orElseThrow(() -> new EntityNotFoundException("Quiz not found with ID: " + quizId));
+
+            return getResult(user, quiz);
+        } catch (Exception ex) {
+            return new ResponseDto(ex.getMessage(), null);
+        }
+    }
+
+
+    public ResponseDto getUserQuizDetails(Long userId) {
+        LinkedHashMap<Long, UserQuizDetails> userQuizDetailsMap = new LinkedHashMap<>();
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+            List<Quiz> userQuizzes = quizRepository.findAllByUser(user, Sort.by(Sort.Direction.DESC, "updatedAt"));
+            String name = user.getName();
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+            for (Quiz quiz : userQuizzes) {
+                Long quizId = quiz.getId();
+                String title = quiz.getTitle();
+
+                Timestamp createdAt = quiz.getCreatedAt();
+                Timestamp updatedAt = quiz.getUpdatedAt();
+
+                // Format timestamps as "yyyy-MM-dd"
+                String createdFormatted = formatter.format(new Date(createdAt.getTime()));
+                String updatedFormatted = formatter.format(new Date(updatedAt.getTime()));
+
+                userQuizDetailsMap.put(quizId, new UserQuizDetails(title, createdFormatted, updatedFormatted));
+            }
+
+            HashMap<String, Object> content = new HashMap<>();
+            content.put("userName", name);
+            content.put("quizList", userQuizDetailsMap);
+
+            return new ResponseDto("OK", content);
+
+        } catch (Exception ex) {
+            return new ResponseDto("Error(EntityNotFoundException) occurred while fetching from db: " + ex.getMessage(), null);
+        }
+    }
+
+
+
+    private ResponseDto getResult(User user, Quiz quiz) {
+        LinkedHashMap<Long, AnswerEvaluation> evaluationMap = new LinkedHashMap<>();
+        try {
+            List<QuizResult> quizResultList = quizResultRepository.findAllByUserAndQuiz(user, quiz);
+            int score = 0;
+            int totalQuestions = quizResultList.size();
+            for(QuizResult result: quizResultList) {
+                boolean isCorrect = result.isCorrect();
+                Option option = result.getSelectedOption();
+                Question questionEntity = result.getQuestion();
+                String correctAnswer = questionEntity.getCorrectAns();
+                String question = questionEntity.getQuestionText();
+                Long questionId = questionEntity.getId();
+                String userAnswer = option.getOptionText();
+
+                evaluationMap.put(questionId, new AnswerEvaluation(question, userAnswer, correctAnswer, isCorrect));
+                if(isCorrect) score++;
+
+            }
+            HashMap<String, Object> resultContent = new HashMap<>();
+            resultContent.put("score", score);
+            resultContent.put("totalQuestions", totalQuestions);
+            resultContent.put("evaluation", evaluationMap);
+
+            return new ResponseDto("OK", resultContent);
+        } catch (Exception ex) {
+            return new ResponseDto("Error(EntityNotFoundException) occurred while fetching quizResult from db: " + ex.getMessage(), null);
+        }
+    }
+
     private static JSONObject extractFirstJsonObject(String text) {
         int start = text.indexOf('{');
         int end = text.lastIndexOf('}');
@@ -217,6 +288,8 @@ public class QuizServiceImpl implements QuizService {
 
         return new QuizResponse(quizId, title, questionDtoList);
     }
+
+//    public List<Q> getUserQuizzes(User user)
 }
 
 //    private JSONObject getQuizFromAi(String prompt) {
