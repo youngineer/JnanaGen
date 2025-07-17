@@ -7,6 +7,8 @@ import com.youngineer.backend.models.User;
 import com.youngineer.backend.repository.UserRepository;
 import com.youngineer.backend.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +28,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseDto userSignup(SignUpRequest signUpRequest) {
+    public ResponseDto signup(SignUpRequest signUpRequest) {
+        System.out.println("Entered signup service");
         if (signUpRequest == null) {
             return new ResponseDto("Invalid user data", null);
         }
@@ -48,7 +51,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseDto userLogin(LoginRequest loginRequest) {
+    public ResponseDto login(LoginRequest loginRequest) {
+        System.out.println("Entered login service");
         String emailId = loginRequest.emailId().trim();
         String userPassword = loginRequest.password();
         try {
