@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface QuizService {
-    public ResponseDto generateQuiz(QuizRequest generateQuizRequest);
-    public ResponseDto calculateScore(QuizResultRequest request);
-    public ResponseDto getQuizInfo(QuizInfo request);
-    public ResponseDto getUserDashboardData(Long userId);
+    public ResponseDto generateQuiz(String emailId, QuizRequest generateQuizRequest);
+    public ResponseDto calculateScore(String emailId, QuizResultRequest request);
+    public ResponseDto getQuizInfo(String emailId, QuizInfo request);
+    public ResponseDto getUserDashboardData(String emailId);
 }

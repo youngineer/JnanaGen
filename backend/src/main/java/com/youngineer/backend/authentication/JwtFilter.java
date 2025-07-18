@@ -30,6 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = null;
         String emailId = null;
+        System.out.println("Inside filter");
 
         if(request.getCookies() != null) {
             for(Cookie cookie: request.getCookies()) {
@@ -46,15 +47,18 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         emailId = JwtHelper.extractEmailId(token);
+        System.out.println(emailId);
         if(emailId != null) {
             UserDetails userDetail = userDetailsService.loadUserByUsername(emailId);
-            if(JwtHelper.validateToken(token, userDetail.getUsername())) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetail, null);
+            if (JwtHelper.validateToken(token, emailId)) {
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetail, null);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
-        }
 
+        }
         filterChain.doFilter(request, response);
     }
 }

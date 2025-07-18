@@ -33,14 +33,9 @@ public class QuizServiceImpl implements QuizService {
     private final QuizResultRepository quizResultRepository;
 
     private final AIServiceImpl aiService;
-
-    @Value("${OPENROUTER_API_KEY}")
-    private String apiKey;
-    private String apiEndpoint = "https://openrouter.ai/api/v1/completions";
-    private final String model = "deepseek/deepseek-chat-v3-0324:free";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(QuizServiceImpl.class);
 
-    public QuizServiceImpl(QuizResultRepository quizResultRepository, Constants constants, AIServiceImpl aiService, QuizRepository quizRepository, OptionRepository optionRepository, UserRepository userRepository, QuestionRepository questionRepository) {
+    public QuizServiceImpl(QuizResultRepository quizResultRepository, AIServiceImpl aiService, QuizRepository quizRepository, OptionRepository optionRepository, UserRepository userRepository, QuestionRepository questionRepository) {
         this.quizRepository = quizRepository;
         this.optionRepository = optionRepository;
         this.userRepository = userRepository;
@@ -50,7 +45,7 @@ public class QuizServiceImpl implements QuizService {
     }
 
 
-    public ResponseDto generateQuiz(QuizRequest generateQuizRequest) {
+    public ResponseDto generateQuiz(String emailId, QuizRequest generateQuizRequest) {
         String prompt = Constants.BASE_PROMPT;
         prompt += "\nUser notes: " + generateQuizRequest.userNotes();
         prompt += "\nAdditional notes: " + generateQuizRequest.additionalContext();
@@ -58,9 +53,12 @@ public class QuizServiceImpl implements QuizService {
         prompt += "\nNumber of Options per question: " + generateQuizRequest.numberOfOptions();
 
         try {
+            User user = userRepository.findByEmailId(emailId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + emailId));
+
             String aiResponse = this.aiService.getAiResponse(prompt);
             JSONObject quizResponse = extractFirstJsonObject(aiResponse);
-            Quiz quiz = storeToDb(quizResponse, 1L);
+            Quiz quiz = storeToDb(quizResponse, user.getId());
             QuizResponse quizDto = convertToQuizDto(quiz);
             return new ResponseDto("OK", quizDto);
         } catch (Exception e) {
@@ -125,9 +123,8 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     @Transactional
-    public ResponseDto calculateScore(QuizResultRequest request) {
+    public ResponseDto calculateScore(String emailId, QuizResultRequest request) {
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        Long userId = 1L; // TODO: Replace with authenticated user ID
         Long quizId = request.quizId();
         LinkedHashMap<Long, Long> userAnswersMap = request.questionOptionMap();
         LinkedHashMap<Long, AnswerEvaluation> evaluationMap = new LinkedHashMap<>();
@@ -136,8 +133,8 @@ public class QuizServiceImpl implements QuizService {
             Quiz quiz = quizRepository.findById(quizId)
                     .orElseThrow(() -> new EntityNotFoundException("Quiz not found with ID: " + quizId));
 
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+            User user = userRepository.findByEmailId(emailId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + emailId));
 
             for (Map.Entry<Long, Long> entry : userAnswersMap.entrySet()) {
                 Long questionId = entry.getKey();
@@ -172,12 +169,12 @@ public class QuizServiceImpl implements QuizService {
     }
 
 
-    public ResponseDto getQuizInfo(QuizInfo request) {
+    public ResponseDto getQuizInfo(String emailId, QuizInfo request) {
         Long userId = request.userId();
         Long quizId = request.quizId();
 
         try {
-            User user = userRepository.findById(userId)
+            User user = userRepository.findByEmailId(emailId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
 
             Quiz quiz = quizRepository.findById(quizId)
@@ -190,11 +187,11 @@ public class QuizServiceImpl implements QuizService {
     }
 
 
-    public ResponseDto getUserDashboardData(Long userId) {
+    public ResponseDto getUserDashboardData(String emailId) {
         LinkedHashMap<Long, UserQuizDetails> userQuizDetailsMap = new LinkedHashMap<>();
         try {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+            User user = userRepository.findByEmailId(emailId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + emailId));
 
             List<Quiz> userQuizzes = quizRepository.findAllByUser(user, Sort.by(Sort.Direction.DESC, "updatedAt"));
             String name = user.getName();
@@ -289,7 +286,6 @@ public class QuizServiceImpl implements QuizService {
         return new QuizResponse(quizId, title, questionDtoList);
     }
 
-//    public List<Q> getUserQuizzes(User user)
 }
 
 //    private JSONObject getQuizFromAi(String prompt) {
