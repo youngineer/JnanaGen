@@ -23,29 +23,28 @@ public class UserController {
         this.quizService = quizService;
     }
 
-
     @PostMapping("/generateQuiz")
-    public ResponseDto generateQuiz(@Valid @RequestBody QuizRequest quizRequest, @CookieValue(name = "accessToken", defaultValue = "") String token) {
-        String emailId = JwtHelper.extractEmailId(token);
+    public ResponseDto generateQuiz(@Valid @RequestBody QuizRequest quizRequest, Authentication authentication) {
+        String emailId = authentication.getName();
         return quizService.generateQuiz(emailId, quizRequest);
     }
 
 
     @PostMapping("/calculateScore")
-    public ResponseDto getQuizResult(@Valid @RequestBody QuizResultRequest request, @CookieValue(name = "accessToken", defaultValue = "") String token) {
-        String emailId = JwtHelper.extractEmailId(token);
+    public ResponseDto getQuizResult(@Valid @RequestBody QuizResultRequest request, Authentication authentication) {
+        String emailId = authentication.getName();
         return quizService.calculateScore(emailId, request);
     }
 
     @PostMapping("/getQuizInfo")
-    public ResponseDto getQuizResult(@Valid @RequestBody QuizInfo request, @CookieValue(name = "accessToken", defaultValue = "") String token) {
-        String emailId = JwtHelper.extractEmailId(token);
+    public ResponseDto getQuizResult(@Valid @RequestBody QuizInfo request, Authentication authentication) {
+        String emailId = authentication.getName();
         return quizService.getQuizInfo(emailId, request);
     }
 
     @PostMapping("/getUserDashboardData")
-    public ResponseDto getUserDashboardData(@Valid @CookieValue(name = "accessToken", defaultValue = "") String token) {
-        String emailId = JwtHelper.extractEmailId(token);
+    public ResponseDto getUserDashboardData(@Valid Authentication authentication) {
+        String emailId = authentication.getName();
         return quizService.getUserDashboardData(emailId);
     }
 

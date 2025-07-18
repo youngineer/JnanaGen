@@ -25,40 +25,54 @@ public class JwtFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
-
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = null;
-        String emailId = null;
-        System.out.println("Inside filter");
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String token = extractTokenFromRequest(request);
 
-        if(request.getCookies() != null) {
-            for(Cookie cookie: request.getCookies()) {
-                if(cookie.getName().equals("accessToken")) {
-                    token = cookie.getValue();
-                    System.out.println(token);
+            if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                String emailId = JwtHelper.extractEmailId(token);
+
+                if (emailId != null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(emailId);
+
+                    // Validate token before creating authentication
+                    if (JwtHelper.validateToken(token, emailId)) {
+                        UsernamePasswordAuthenticationToken authenticationToken =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails,
+                                        null,
+                                        userDetails.getAuthorities()
+                                );
+
+                        authenticationToken.setDetails(
+                                new WebAuthenticationDetailsSource().buildDetails(request)
+                        );
+
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Log the error but don't stop the filter chain
+            System.err.println("JWT Filter error: " + e.getMessage());
+            // Clear any partial authentication
+            SecurityContextHolder.clearContext();
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private String extractTokenFromRequest(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
                 }
             }
         }
-
-        if(token == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        emailId = JwtHelper.extractEmailId(token);
-        System.out.println(emailId);
-        if(emailId != null) {
-            UserDetails userDetail = userDetailsService.loadUserByUsername(emailId);
-            if (JwtHelper.validateToken(token, emailId)) {
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetail, null);
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
-
-        }
-        filterChain.doFilter(request, response);
+        return null;
     }
 }
+
