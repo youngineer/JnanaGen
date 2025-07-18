@@ -190,7 +190,7 @@ public class QuizServiceImpl implements QuizService {
     }
 
 
-    public ResponseDto getUserQuizDetails(Long userId) {
+    public ResponseDto getUserDashboardData(Long userId) {
         LinkedHashMap<Long, UserQuizDetails> userQuizDetailsMap = new LinkedHashMap<>();
         try {
             User user = userRepository.findById(userId)

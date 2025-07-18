@@ -16,5 +16,5 @@ public interface QuizService {
     public ResponseDto generateQuiz(QuizRequest generateQuizRequest);
     public ResponseDto calculateScore(QuizResultRequest request);
     public ResponseDto getQuizInfo(QuizInfo request);
-    public ResponseDto getUserQuizDetails(Long userId);
+    public ResponseDto getUserDashboardData(Long userId);
 }

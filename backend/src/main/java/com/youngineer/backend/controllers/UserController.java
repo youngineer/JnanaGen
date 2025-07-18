@@ -40,7 +40,7 @@ public class UserController {
 
     @PostMapping("/getUserDashboardData")
     public ResponseDto getUserDashboardData(@Valid @RequestBody UserIdRequest request) {
-        return quizService.getUserQuizDetails(request.userId());
+        return quizService.getUserDashboardData(request.userId());
     }
 
 }

@@ -6,9 +6,8 @@ import com.youngineer.backend.dto.responses.ResponseDto;
 import com.youngineer.backend.models.User;
 import com.youngineer.backend.repository.UserRepository;
 import com.youngineer.backend.services.AuthService;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.youngineer.backend.utils.JwtHelper;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,6 @@ import java.sql.Timestamp;
 @Transactional
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
-    private static final String SUCCESS_MESSAGE = "OK";
 
 
     public AuthServiceImpl(UserRepository userRepository) {
@@ -51,20 +49,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseDto login(LoginRequest loginRequest) {
-        System.out.println("Entered login service");
-        String emailId = loginRequest.emailId().trim();
-        String userPassword = loginRequest.password();
-        try {
-            User user = userRepository.findByEmailId(emailId)
-                    .orElseThrow(() -> new EntityNotFoundException(String.format("Email id: %s not registered", emailId)));
-
-            if(!checkPassword(userPassword, user.getPassword())) throw new Exception("incorrect credentials");
-
-            return new ResponseDto(SUCCESS_MESSAGE, "jwt_token");
-        } catch (Exception e) {
-            return new ResponseDto("Error logging in: " + e, null);
-        }
+    public String login(LoginRequest request) {
+        return JwtHelper.generateToken(request.emailId());
     }
 
     private User convertToUserEntity(SignUpRequest signUpRequest) {
@@ -90,3 +76,22 @@ public class AuthServiceImpl implements AuthService {
         return BCrypt.checkpw(userPassword, hashedPassword);
     }
 }
+
+/*
+@Override
+    public ResponseDto login(LoginRequest loginRequest) {
+        String emailId = loginRequest.emailId().trim();
+        String userPassword = loginRequest.password();
+        String token = JwtHelper.generateToken(emailId);
+        try {
+            User user = userRepository.findByEmailId(emailId)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format("Email id: %s not registered", emailId)));
+
+            if(!checkPassword(userPassword, user.getPassword())) throw new Exception("incorrect credentials");
+
+            return new ResponseDto(SUCCESS_MESSAGE, token);
+        } catch (Exception e) {
+            return new ResponseDto("Error logging in: " + e, null);
+        }
+    }
+ */

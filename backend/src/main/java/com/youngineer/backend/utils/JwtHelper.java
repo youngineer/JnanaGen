@@ -4,7 +4,6 @@ import com.youngineer.backend.dto.requests.LoginRequest;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.security.access.AccessDeniedException;
@@ -36,9 +35,9 @@ public class JwtHelper {
         return getTokenBody(token).getSubject();
     }
 
-    public static Boolean validateToken(String token, LoginRequest request) {
+    public static Boolean validateToken(String token, String emailId) {
         final String userEmailId = extractEmailId(token);
-        return userEmailId.equals(request.emailId()) && !isTokenExpired(token);
+        return userEmailId.equals(emailId) && !isTokenExpired(token);
     }
 
     private static Claims getTokenBody(String token) {
