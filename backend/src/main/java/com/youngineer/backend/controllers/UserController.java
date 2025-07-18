@@ -1,17 +1,13 @@
 package com.youngineer.backend.controllers;
 
 
-import com.sun.security.auth.UserPrincipal;
 import com.youngineer.backend.dto.requests.QuizInfo;
 import com.youngineer.backend.dto.requests.QuizRequest;
 import com.youngineer.backend.dto.requests.QuizResultRequest;
-import com.youngineer.backend.dto.requests.UserIdRequest;
 import com.youngineer.backend.dto.responses.ResponseDto;
 import com.youngineer.backend.services.QuizService;
-import com.youngineer.backend.utils.JwtHelper;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
