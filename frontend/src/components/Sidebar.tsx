@@ -1,10 +1,10 @@
-import React, { type FC, type JSX } from 'react'
+import { type FC, type JSX } from 'react'
 
 const Sidebar: FC = (): JSX.Element => {
   return (
-    <div>
-        <div>
-            <h4>Notes to Quiz</h4>
+    <div className='max-w-1/7'>
+        <div className='p-3 font-bold'>
+            <h4>Welcome, Kartik</h4>
             <hr />
         </div>
     </div>

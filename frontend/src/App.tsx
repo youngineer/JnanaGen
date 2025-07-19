@@ -1,12 +1,11 @@
 import type { JSX } from 'react'
-import './App.css'
-import Dashboard from './components/Dashboard'
+import Body from './components/Body'
 
 function App(): JSX.Element {
 
   return (
     <>
-      <Dashboard />
+      <Body />
     </>
   )
 }

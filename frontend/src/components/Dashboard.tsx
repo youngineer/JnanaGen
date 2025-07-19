@@ -1,10 +1,10 @@
 import { type FC, type JSX } from 'react'
-import Sidebar from './Sidebar';
+import QuizSpecification from './QuizSpecification';
 
 const Dashboard: FC = (): JSX.Element => {
   return (
-    <div>
-        <Sidebar />
+    <div className='flex'>
+        <QuizSpecification />
     </div>
   )
 }
