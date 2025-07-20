@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, type FC, type JSX } from "react"
 
 
-const ThemeController = () => {
+const ThemeController: FC = (): JSX.Element => {
     const [theme, setTheme] = useState<string>("default");
 
 
@@ -12,7 +12,7 @@ const ThemeController = () => {
     }, []);
 
     const toggleTheme = () => {
-        const newTheme = theme === "valentine" ? "forest" : "valentine";
+        const newTheme = theme === "valentine" ? "dark" : "valentine";
         setTheme(newTheme);
         document.documentElement.setAttribute("data-theme", newTheme);
         localStorage.setItem("theme", newTheme);
@@ -22,11 +22,11 @@ const ThemeController = () => {
     <div>
         <label className="swap swap-rotate">
             {/* this hidden checkbox controls the state */}
-            <input type="checkbox" className="theme-controller" value="synthwave" onClick={toggleTheme}/>
+            <input type="checkbox" className="theme-controller" value="dark" onClick={toggleTheme}/>
 
             {/* sun icon */}
             <svg
-                className="swap-off h-7 w-7 fill-current"
+                className="swap-off h-7 w-7 fill-current text-base-200"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24">
                 <path

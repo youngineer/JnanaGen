@@ -1,9 +1,10 @@
+import type { FC, JSX } from "react"
 
 
-const Footer = () => {
+const Footer: FC = (): JSX.Element => {
   return (
-    <div>
-        <footer className="footer sm:footer-horizontal bg-neutral text-neutral-content items-center p-4">
+    <div className="fixed bottom-0 min-w-full">
+        <footer className="footer sm:footer-horizontal bg-neutral text-neutral-content items-center p-2">
             <aside className="grid-flow-col items-center">
                 <svg
                 width="36"

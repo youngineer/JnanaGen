@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FC, type FormEvent, type JSX } from "react";
 
 interface QuizSpecificationState {
     userNotes: string,
@@ -8,7 +8,7 @@ interface QuizSpecificationState {
 }
 
 
-const QuizSpecification = () => {
+const QuizSpecification: FC = (): JSX.Element => {
     const [formData, setFormData] = useState<QuizSpecificationState>({
         userNotes: "",
         additionalNotes: "",

@@ -3,7 +3,7 @@ import QuizSpecification from './QuizSpecification';
 
 const Dashboard: FC = (): JSX.Element => {
   return (
-    <div className='flex'>
+    <div>
         <QuizSpecification />
     </div>
   )
