@@ -8,6 +8,7 @@ import com.youngineer.backend.utils.JwtHelper;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -41,20 +42,31 @@ public class AuthController {
     public ResponseEntity<ResponseDto> signup(@Valid @RequestBody SignUpRequest request) {
         try {
             ResponseDto responseDto = authService.signup(request);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(responseDto);
+
+            if ("OK".equals(responseDto.message())) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseDto(responseDto.message(), null));
+            }
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new ResponseDto(e.getMessage(), null));
         } catch (DataAccessException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseDto(e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDto("An unexpected error occurred: " + e.getMessage(), null));
         }
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<ResponseDto> userLogin(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.emailId(), request.password()));
+
             if (authentication.isAuthenticated()) {
                 String accessToken = JwtHelper.generateToken(request.emailId());
 
@@ -73,8 +85,11 @@ public class AuthController {
             }
         } catch (BadCredentialsException | UsernameNotFoundException e) {
             return ResponseEntity.badRequest().body(new ResponseDto("Invalid credentials", null));
-        }  catch (AuthenticationException e) {
+        } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDto("Authentication failed", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDto("An unexpected error occurred: " + e.getMessage(), null));
         }
     }
 

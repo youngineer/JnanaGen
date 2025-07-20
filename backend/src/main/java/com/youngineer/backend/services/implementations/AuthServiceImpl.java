@@ -7,7 +7,6 @@ import com.youngineer.backend.models.User;
 import com.youngineer.backend.repository.UserRepository;
 import com.youngineer.backend.services.AuthService;
 import com.youngineer.backend.utils.JwtHelper;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
             }
 
         } catch (Exception e) {
-            return new ResponseDto("Error creating user: " + e, null);
+            return new ResponseDto("Error creating user: " + e.getMessage(), null);
         }
     }
 
