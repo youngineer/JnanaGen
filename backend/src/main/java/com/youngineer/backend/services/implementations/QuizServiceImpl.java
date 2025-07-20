@@ -99,6 +99,7 @@ public class QuizServiceImpl implements QuizService {
             Question question = new Question();
             question.setQuestionText(questionObj.getString("question"));
             question.setQuiz(quiz);
+            question.setExplanation(questionObj.getString("explanation"));
 
             JSONArray options = questionObj.getJSONArray("options");
             if (options.isEmpty()) {
@@ -127,7 +128,6 @@ public class QuizServiceImpl implements QuizService {
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
         Long quizId = request.quizId();
         LinkedHashMap<Long, Long> userAnswersMap = request.questionOptionMap();
-        LinkedHashMap<Long, AnswerEvaluation> evaluationMap = new LinkedHashMap<>();
 
         try {
             Quiz quiz = quizRepository.findById(quizId)
@@ -239,8 +239,9 @@ public class QuizServiceImpl implements QuizService {
                 String question = questionEntity.getQuestionText();
                 Long questionId = questionEntity.getId();
                 String userAnswer = option.getOptionText();
+                String explanation = questionEntity.getExplanation();
 
-                evaluationMap.put(questionId, new AnswerEvaluation(question, userAnswer, correctAnswer, isCorrect));
+                evaluationMap.put(questionId, new AnswerEvaluation(question, userAnswer, correctAnswer, isCorrect, explanation));
                 if(isCorrect) score++;
 
             }

@@ -21,6 +21,9 @@ public class Question {
     @Column(name = "correct_option")
     private String correctOption;
 
+    @Column(name = "explanation")
+    private String explanation;
+
     @ManyToOne
     @JoinColumn(name = "quiz_id")
     @JsonBackReference
@@ -33,7 +36,6 @@ public class Question {
     public Long getId() {
         return id;
     }
-
 
     public String getQuestionText() {
         return questionText;
@@ -49,6 +51,22 @@ public class Question {
 
     public void setCorrectAns(String correctAns) {
         this.correctOption = correctAns;
+    }
+
+    public String getCorrectOption() {
+        return correctOption;
+    }
+
+    public void setCorrectOption(String correctOption) {
+        this.correctOption = correctOption;
+    }
+
+    public String getExplanation() {
+        return explanation;
+    }
+
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
     }
 
     public Quiz getQuiz() {
