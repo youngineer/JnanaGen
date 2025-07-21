@@ -4,12 +4,13 @@ import Footer from './Footer'
 import NavbarTop from './NavbarTop'
 import QuizPage from './QuizPage'
 import AuthPage from './AuthPage'
+import { Outlet } from 'react-router'
 
 const Body: FC = (): JSX.Element => {
   return (
     <div>
       <NavbarTop />
-      <AuthPage />
+        <Outlet />
       <Footer />
     </div>
   )

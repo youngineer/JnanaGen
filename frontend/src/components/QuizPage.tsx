@@ -1,4 +1,4 @@
-import { useState, type FC, type JSX } from "react";
+import { useEffect, useState, type FC, type JSX } from "react";
 
 const questions = [
   {
@@ -40,6 +40,10 @@ const QuizPage: FC = (): JSX.Element => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
     const [selectedAnswers, setSelectedAnswers] = useState<string[]>(new Array(totalQuestions));
 
+    useEffect(() => {
+      
+    }, []);
+    
     const handleNext = (): void => {
       if(currentQuestionIndex < totalQuestions - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
@@ -69,8 +73,8 @@ const QuizPage: FC = (): JSX.Element => {
             <div className="mb-6">
                 <progress 
                     className="progress w-56 mx-1" 
-                    value={currentQuestionIndex + 1} 
-                    max={questions.length}>
+                    value={currentQuestionIndex} 
+                    max={questions.length - 1}>
                 </progress>
                 <span className="ml-2">
                     {currentQuestionIndex + 1} out of {questions.length}
