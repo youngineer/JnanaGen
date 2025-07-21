@@ -13,7 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -229,6 +228,7 @@ public class QuizServiceImpl implements QuizService {
         LinkedHashMap<Long, AnswerEvaluation> evaluationMap = new LinkedHashMap<>();
         try {
             List<QuizResult> quizResultList = quizResultRepository.findAllByUserAndQuiz(user, quiz);
+            String title = quiz.getTitle();
             int score = 0;
             int totalQuestions = quizResultList.size();
             for(QuizResult result: quizResultList) {
@@ -245,7 +245,13 @@ public class QuizServiceImpl implements QuizService {
                 if(isCorrect) score++;
 
             }
+            double percentage = (double) score / totalQuestions * 100;
+            double finalPercentage = Math.round(percentage * 100.0) / 100.0;
+
+
             HashMap<String, Object> resultContent = new HashMap<>();
+            resultContent.put("percentage", finalPercentage);
+            resultContent.put("title", title);
             resultContent.put("score", score);
             resultContent.put("totalQuestions", totalQuestions);
             resultContent.put("evaluation", evaluationMap);
