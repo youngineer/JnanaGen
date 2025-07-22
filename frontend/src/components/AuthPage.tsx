@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent, type FC } from "react"
 import { handleLogin, handleSignup } from "../services/authServices";
 import AlertMessage from "./AlertMessage";
+import { useNavigate } from "react-router";
 
 interface SignupInterface {
   name: string;
@@ -34,6 +35,8 @@ const AuthPage: FC = () => {
         isSuccess: false,
         message: ''
     });
+
+    const navigate = useNavigate();
 
   const toggleLogin = (): void => {
     setIsLogin(prev => !prev);
@@ -74,6 +77,8 @@ const AuthPage: FC = () => {
 
         setIsLogin(true);
       }
+
+      navigate("/home")
       
     } catch (error) {
       setAlertInfo({

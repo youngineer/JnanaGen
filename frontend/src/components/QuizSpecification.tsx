@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FC, type FormEvent } from "react";
-import { fetchQuiz } from "../services/quizServices";
+import { generateQuiz } from "../services/quizServices";
 
 export interface QuizSpecificationState {
     userNotes: string;
@@ -29,7 +29,7 @@ const QuizSpecification: FC = () => {
     const handleSubmit = async(e: FormEvent) => {
         e.preventDefault();
         try {
-            await fetchQuiz(formData);
+            await generateQuiz(formData);
             // Navigate to quiz page after successful fetch
         } catch (error) {
             console.error('Failed to fetch quiz:', error);
