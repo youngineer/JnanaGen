@@ -42,32 +42,37 @@ const QuizInfo: FC = () => {
     }
   }, [path])
 
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <h2 className="text-2xl font-bold mb-6">Quiz Results</h2>
+      <h2 className="flex text-2xl font-bold my-6 justify-center text-secondary">{title}</h2>
+      {/* <div className="radial-progress" style={{ "--value": {percentage} } as React.CSSProperties } 
+        aria-valuenow={70} role="progressbar">{percentage}%</div> */}
+
+      <h3 className="flex text-2xl font-bold my-6 justify-center text-secondary">Score: {score}/{totalQuestions}</h3>
       <div className="space-y-4">
         {Object.entries(quiz).map(([id, question]) => (
           <div 
             key={id}
             role="alert" 
             className={`card ${
-              question.isCorrect ? 'bg-success/10' : 'bg-error/10'
+              question.isCorrect ? 'bg-success/60' : 'bg-error/20'
             } shadow-lg`}
           >
             <div className="card-body">
-              <h3 className="card-title">Q. {question.question}</h3>
+              <h3 className="card-title text-primary">Q. {question.question}</h3>
               <div className="space-y-2 text-sm">
                 <p className={`${
-                  question.isCorrect ? 'text-success' : 'text-error'
+                  question.isCorrect ? 'text-secondary' : 'text-error'
                 } font-medium`}>
                   Your Answer: {question.userAnswer}
                 </p>
-                <p className="text-success font-medium">
+                <p className="text-secondary font-medium">
                   Correct Answer: {question.correctAnswer}
                 </p>
                 <div className="divider my-2"></div>
-                <p className="text-base-content/80">
-                  <span className="font-medium">Explanation:</span> {question.explanation}
+                <p className="text-primary font-bold">
+                  <span className="">Explanation:</span> {question.explanation}
                 </p>
               </div>
             </div>

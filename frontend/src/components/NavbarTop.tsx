@@ -1,19 +1,58 @@
-import type { FC } from 'react'
+import { useEffect, type FC, type MouseEvent } from 'react'
 import ThemeController from './ThemeController'
+import { Link, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router';
 
 const NavbarTop: FC = () => {
+    const navigate = useNavigate();
+
+    const handleLogout = (e: MouseEvent<HTMLButtonElement>): void => {
+        localStorage.removeItem("token");
+        navigate("/auth");
+    }
+
+    const location = useLocation();
+    useEffect(() => {
+        if (!localStorage.getItem("token")) {
+            navigate("/auth");
+        }
+    }, []);
 
     return (
-        <div className='min-w-full max-h-10'>
-            <div className="navbar shadow-sm bg-neutral">
-                <div className="flex-1">
-                    <a className="btn btn-ghost btn-neutral text-xl text-neutral-content">Welcome, Kartik</a>
-                </div>
-                <div className="flex-none">
-                    <ThemeController />
-                </div>
+        <nav className="navbar bg-neutral shadow-sm px-4">
+            <div className="flex-1 flex items-center gap-4">
+                <a className="btn-ghost text-xl text-neutral-content font-bold">
+                    notes to quiz
+                </a>
+                <ul className="menu menu-horizontal bg-neutral text-base-100 rounded-box hidden md:flex">
+                    <li>
+                        <Link to={"/home"} className="flex items-center gap-2">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                                />
+                            </svg>
+                            Dashboard
+                        </Link>
+                    </li>
+                </ul>
             </div>
-        </div>
+            <div className="flex items-center gap-4">
+                <ThemeController />
+                <button className="btn flex items-center btn-warning" onClick={handleLogout}>
+                    Logout
+                </button>
+            </div>
+        </nav>
     )
 }
 

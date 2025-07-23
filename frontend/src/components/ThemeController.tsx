@@ -12,7 +12,7 @@ const ThemeController: FC = (): JSX.Element => {
     }, []);
 
     const toggleTheme = () => {
-        const newTheme = theme === "valentine" ? "dark" : "valentine";
+        const newTheme = theme === "valentine" ? "abyss" : "valentine";
         setTheme(newTheme);
         document.documentElement.setAttribute("data-theme", newTheme);
         localStorage.setItem("theme", newTheme);
@@ -22,7 +22,7 @@ const ThemeController: FC = (): JSX.Element => {
     <div>
         <label className="swap swap-rotate">
             {/* this hidden checkbox controls the state */}
-            <input type="checkbox" className="theme-controller" value="dark" onClick={toggleTheme}/>
+            <input type="checkbox" className="theme-controller" value="abyss" onClick={toggleTheme}/>
 
             {/* sun icon */}
             <svg

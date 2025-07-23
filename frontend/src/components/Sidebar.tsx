@@ -41,7 +41,7 @@ const Sidebar: FC = (): JSX.Element => {
               <ul>
                 {
                   Object.entries(quizList).map(([id, quiz]) => (
-                    <div className="tooltip" data-tip={quiz.title}>
+                    <div className="tooltip tooltip-right tooltip-warning" data-tip={quiz.title} key={id}>
                       <li key={id}>
                           <Link to={`/quizInfo/${id}`}>{quiz.title}</Link>
                       </li>
