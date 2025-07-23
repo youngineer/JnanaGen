@@ -1,22 +1,27 @@
-import { useEffect, type FC, type MouseEvent } from 'react'
+import { useEffect, useState, type FC, type MouseEvent } from 'react'
 import ThemeController from './ThemeController'
 import { Link, useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router';
 
 const NavbarTop: FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [isTokenPresent, setIsTokenPresent] = useState<boolean>(false);
 
     const handleLogout = (e: MouseEvent<HTMLButtonElement>): void => {
         localStorage.removeItem("token");
         navigate("/auth");
     }
 
-    const location = useLocation();
     useEffect(() => {
-        if (!localStorage.getItem("token")) {
-            navigate("/auth");
-        }
-    }, []);
+    const token = localStorage.getItem("token");
+    if(token) setIsTokenPresent(true);
+    if (!token && location.pathname !== "/auth") {
+        navigate("/auth");
+    }
+    }, [navigate, location.pathname]);
+
+    const showNavLinks = isTokenPresent && location.pathname !== "/auth";
 
     return (
         <nav className="navbar bg-neutral shadow-sm px-4">
@@ -24,7 +29,7 @@ const NavbarTop: FC = () => {
                 <a className="btn-ghost text-xl text-neutral-content font-bold">
                     notes to quiz
                 </a>
-                <ul className="menu menu-horizontal bg-neutral text-base-100 rounded-box hidden md:flex">
+                {showNavLinks && (<ul className="menu menu-horizontal bg-neutral text-base-100 rounded-box hidden md:flex">
                     <li>
                         <Link to={"/home"} className="flex items-center gap-2">
                             <svg
@@ -44,13 +49,16 @@ const NavbarTop: FC = () => {
                             Dashboard
                         </Link>
                     </li>
-                </ul>
+                </ul>)}
             </div>
             <div className="flex items-center gap-4">
                 <ThemeController />
-                <button className="btn flex items-center btn-warning" onClick={handleLogout}>
+                {showNavLinks && (
+                    <button className="btn flex items-center btn-warning" onClick={handleLogout}>
                     Logout
                 </button>
+            )
+            }
             </div>
         </nav>
     )

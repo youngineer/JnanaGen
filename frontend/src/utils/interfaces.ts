@@ -50,3 +50,27 @@ export interface AttemptedQuizInfo {
     score: number,
     percentage: number
 }
+
+export interface Option {
+    id: number,
+    option: string
+}
+
+export interface Question {
+    id: number,
+    question: string,
+    options: Option[]
+}
+
+export interface Quiz {
+    id: number,
+    title: string,
+    questions: Question[]
+}
+
+
+export interface ScorePayload {
+    quizId: number,
+    userAnswerList: string[],
+    questionOptionMap: Record<number, number>
+}

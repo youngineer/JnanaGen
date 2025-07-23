@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type FC, type FormEvent } from "react";
 import { generateQuiz } from "../services/quizServices";
+import { useNavigate } from "react-router";
 
 export interface QuizSpecificationState {
     userNotes: string;
@@ -9,12 +10,15 @@ export interface QuizSpecificationState {
 }
 
 const QuizSpecification: FC = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState<QuizSpecificationState>({
         userNotes: "",
         totalQuestions: 6,
         numberOfOptions: 4,
         additionalNotes: "",
     });
+
+    const [loading, setLoading] = useState<boolean>(false);
 
     const handleFormDataChange = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -29,7 +33,10 @@ const QuizSpecification: FC = () => {
     const handleSubmit = async(e: FormEvent) => {
         e.preventDefault();
         try {
+            navigate("/quiz")
+            setLoading(true);
             await generateQuiz(formData);
+            setLoading(false);
             // Navigate to quiz page after successful fetch
         } catch (error) {
             console.error('Failed to fetch quiz:', error);
