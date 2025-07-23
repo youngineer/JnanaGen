@@ -56,32 +56,26 @@ const Sidebar: FC = (): JSX.Element => {
 
   return (
     <>
-      <div className='mt-6'>
-        <ul className="menu bg-base-200 rounded-box w-56">
-          <li>
-            <details open>
-              <summary className='font-bold'>Your Quizzes</summary>
-              <ul className='flex flex-col gap-1'>
-                {
-                  Object.entries(quizList).map(([id, quiz]) => (
-                    <li key={id} className="w-full">
-                      <div className="tooltip tooltip-right tooltip-warning w-full" data-tip={quiz.title}>
-                        <button
-                          className="btn btn-soft btn-secondary block w-full whitespace-normal break-words px-2 py-1 rounded hover:bg-base-300 transition"
-                          style={{ wordBreak: 'break-word' }}
-                          onClick={() => handleQuizRedirect(id)}
-                        >
-                          {quiz.title}
-                        </button>
-                      </div>
-                    </li>
-                  ))
-                }
-              </ul>
-            </details>
-          </li>
+      <details open className='mx-4'>
+        <summary className='font-bold '>Your Quizzes</summary>
+        <ul className='flex flex-col gap-1'>
+          {
+            Object.entries(quizList).map(([id, quiz]) => (
+              <li key={id} className="w-full">
+                <div className="tooltip tooltip-right tooltip-warning w-full" data-tip={quiz.title}>
+                  <button
+                    className="btn btn-soft-content w-full px-2 py-1 rounded hover:btn-soft transition"
+                    style={{ wordBreak: 'break-word' }}
+                    onClick={() => handleQuizRedirect(id)}
+                  >
+                    {quiz.title}
+                  </button>
+                </div>
+              </li>
+            ))
+          }
         </ul>
-      </div>
+      </details>
       {alert.show && (
         <div className={`alert ${alert.isSuccess ? 'alert-success' : 'alert-error'} mt-4`}>
           {alert.message}

@@ -1,17 +1,11 @@
 import { useState, type ChangeEvent, type FC, type FormEvent } from "react";
 import { generateQuiz } from "../services/quizServices";
 import { useNavigate } from "react-router";
-
-export interface QuizSpecificationState {
-    userNotes: string;
-    totalQuestions: number;
-    numberOfOptions: number;
-    additionalNotes: string;
-}
+import type { QuizSpecification } from "../utils/interfaces";
 
 const QuizSpecification: FC = () => {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState<QuizSpecificationState>({
+    const [formData, setFormData] = useState<QuizSpecification>({
         userNotes: "",
         totalQuestions: 6,
         numberOfOptions: 4,
@@ -44,17 +38,17 @@ const QuizSpecification: FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto py-8">
+        <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto py-4">
             <div className="space-y-6">
                 <div className="mb-6">
-                    <h3 className="font-bold text-xl md:text-2xl mb-4">Create your quiz</h3>
+                    <h3 className="font-bold text-xl md:text-2xl mb-4">Help us create your quiz</h3>
                     <fieldset className="fieldset w-full">
-                        <legend className="fieldset-legend">Enter your notes and we will generate the quiz for you</legend>
+                        <legend className="fieldset-legend">Provide your notes and we'll generate the quiz for you</legend>
                         <textarea 
                             name="userNotes"
                             value={formData.userNotes}
-                            className="textarea h-28 md:h-36 w-full" 
-                            placeholder="Your notes here"
+                            className="textarea h-28 md:h-36 w-full rounded-2xl" 
+                            placeholder="Share the key topics, concepts, or content you want to be included in the quiz. The more specific, the better!"
                             onChange={handleFormDataChange}
                             required
                         />
@@ -63,12 +57,12 @@ const QuizSpecification: FC = () => {
 
                 <div className="mb-6">
                     <fieldset className="fieldset w-full">
-                        <legend className="fieldset-legend">Additional Notes</legend>
+                        <legend className="fieldset-legend">Additional Notes (Optional)</legend>
                         <textarea 
                             name="additionalNotes"
                             value={formData.additionalNotes}
-                            className="textarea h-20 md:h-24 w-full" 
-                            placeholder="Additional notes here"
+                            className="textarea h-20 md:h-24 w-full rounded" 
+                            placeholder="Any extra instructions or preferences for your quiz (e.g., difficulty level, types of questions)?"
                             onChange={handleFormDataChange}
                         />
                     </fieldset>
@@ -95,7 +89,7 @@ const QuizSpecification: FC = () => {
                     </fieldset>
 
                     <fieldset className="fieldset w-full md:w-1/2">
-                        <legend className="fieldset-legend">Options per question</legend>
+                        <legend className="fieldset-legend">Number of Options per Question</legend>
                         <select 
                             name="numberOfOptions"
                             value={formData.numberOfOptions}
@@ -117,7 +111,7 @@ const QuizSpecification: FC = () => {
                         className="btn btn-primary btn-wide"
                         disabled={!formData.userNotes.trim()}
                     >
-                        Generate Quiz
+                        {loading ? 'Generating Quiz...' : 'Generate Quiz'}
                     </button>
                 </div>
             </div>

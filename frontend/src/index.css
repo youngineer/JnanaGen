@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: valentine --default, abyss --prefersdark;
+  themes: valentine --default, dark --prefersdark;
   root: ":root";
   include: ;
   exclude: ;
