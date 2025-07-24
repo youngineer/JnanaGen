@@ -10,7 +10,7 @@ import Dashboard from './components/Dashboard'
 function App(): JSX.Element {
   return (
     <>
-      <BrowserRouter basename='/'>
+      <BrowserRouter basename='/' >
         <Routes>
           <Route path='/' element={<Body />}>
             <Route path='/auth' element={<AuthPage />}></Route>
