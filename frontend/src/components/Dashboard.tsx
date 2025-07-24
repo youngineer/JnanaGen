@@ -1,6 +1,6 @@
 import { type FC } from 'react'
-import QuizSpecification from './QuizSpecification'
 import Sidebar from './Sidebar'
+import QuizParams from './QuizParams'
 
 
 const Dashboard: FC = () => {
@@ -8,7 +8,7 @@ const Dashboard: FC = () => {
   return (
     <div className="flex">
       <Sidebar />
-      <QuizSpecification />
+      <QuizParams />
     </div>
   )
 }

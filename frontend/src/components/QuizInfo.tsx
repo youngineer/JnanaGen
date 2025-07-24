@@ -1,18 +1,15 @@
 import { useEffect, useState, type FC } from 'react'
 import { fetchUserQuiz } from '../services/quizServices';
 import type { Evaluation } from '../utils/interfaces';
-import { useNavigate, useOutletContext } from 'react-router';
+import { useNavigate } from 'react-router';
 
 
 
 const QuizInfo: FC = () => {
   const [quiz, setQuiz] = useState<Evaluation>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState<string>("");
   const [score, setScore] = useState<number>(-1);
   const [percentage, setPercentage] = useState<number>(-1);
-  const [totalQuestions, setTotalQuestions] = useState<number>(-1);
   const navigate = useNavigate()
 
   const path = location.pathname;
@@ -20,23 +17,17 @@ const QuizInfo: FC = () => {
   useEffect(() => {
     const getQuiz = async () => {
       try {
-        setIsLoading(true);
-        const {evaluation, title, score, percentage, totalQuestions} = await fetchUserQuiz(path);
+        const {evaluation, title, score, percentage } = await fetchUserQuiz(path);
         
         setQuiz(evaluation);
         setTitle(title);
         setScore(score);
         setPercentage(percentage);
-        setTotalQuestions(totalQuestions);
-        setError(null);
 
       } catch (err) {
-        setError(err as string);
         setQuiz([]);
 
-      } finally {
-        setIsLoading(false);
-      }
+      } 
     }
 
     if (path) {

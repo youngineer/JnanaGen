@@ -3,7 +3,7 @@ import { generateQuiz } from "../services/quizServices";
 import { useNavigate } from "react-router";
 import type { QuizSpecification } from "../utils/interfaces";
 
-const QuizSpecification: FC = () => {
+const QuizParams: FC = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState<QuizSpecification>({
         userNotes: "",
@@ -119,4 +119,4 @@ const QuizSpecification: FC = () => {
     );
 };
 
-export default QuizSpecification;
+export default QuizParams;

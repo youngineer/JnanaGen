@@ -128,7 +128,7 @@ const QuizPage: FC = () => {
                     </h2>
                     
                     <div className="flex flex-col gap-2 my-4">
-                        {questions[currentQuestionIndex].options.map((optionObj: Option, index) => (
+                        {questions[currentQuestionIndex].options.map((optionObj: Option) => (
                             <label 
                                 key={optionObj.id} 
                                 className={`btn ${selectedAnswers[currentQuestionIndex] === optionObj.option ? 'btn-primary' : 'btn-ghost'}`}
