@@ -49,43 +49,36 @@ const QuizInfo: FC = () => {
     navigate('/quiz');
   }
 
+  console.log(score);
+
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <h2 className="flex text-2xl font-bold my-6 justify-center text-secondary">{title}</h2>
-      {/* <div className="radial-progress" style={{ "--value": {percentage} } as React.CSSProperties } 
-        aria-valuenow={70} role="progressbar">{percentage}%</div> */}
-
-      <h3 className="flex text-2xl font-bold my-6 justify-center text-secondary">Score: {score}/{totalQuestions}</h3>
-      <div className="space-y-4">
-        {Object.entries(quiz).map(([id, question]) => (
-          <div 
-            key={id}
-            role="alert" 
-            className={`card ${
-              question.isCorrect ? 'bg-success/60' : 'bg-error/20'
-            } shadow-lg`}
-          >
+    <div className="max-w-3xl mx-auto space-y-6 mb-auto">
+      <h1 className="text-2xl font-bold flex justify-center items-center">{title}</h1>
+        <div className="text-xl flex justify-center items-center gap-4 mb-4">
+        <h3>Score:</h3>
+        <div
+          className="radial-progress text-primary"
+          style={{ "--value": percentage } as React.CSSProperties}
+          aria-valuenow={percentage}
+          role="progressbar"
+        >
+          {percentage}%
+        </div>
+      </div>
+      
+      {
+        Object.entries(quiz).map(([id, data]) => (
+          <div key={id} className="card bg-primary text-primary-content w-auto">
             <div className="card-body">
-              <h3 className="card-title text-primary">Q. {question.question}</h3>
-              <div className="space-y-2 text-sm">
-                <p className={`${
-                  question.isCorrect ? 'text-secondary' : 'text-error'
-                } font-medium`}>
-                  Your Answer: {question.userAnswer}
-                </p>
-                <p className="text-secondary font-medium">
-                  Correct Answer: {question.correctAnswer}
-                </p>
-                <div className="divider my-2"></div>
-                <p className="text-primary font-bold">
-                  <span className="">Explanation:</span> {question.explanation}
-                </p>
-              </div>
+              <h2 className="card-title">Q. {data.question}</h2>
+              <h4>Your answer: {data.userAnswer}</h4>
+              <h4>Correct answer: {data.correctAnswer}</h4>
+              <h3 className='text-success-content'>Explanation: {data.explanation}</h3>
             </div>
           </div>
-        ))}
-      </div>
+        ))
+      }
     </div>
   )
 }

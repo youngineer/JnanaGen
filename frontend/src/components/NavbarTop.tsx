@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import ThemeController from './ThemeController'
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom';
@@ -38,7 +37,7 @@ const NavbarTop = () => {
                         </Link>
                     </div>
                     {/* Right side */}
-                    <div className="flex items-center gap-4 ml-auto">
+                    <div className="flex items-center bg-neutral text-neutral-content gap-4 ml-auto">
                         <ThemeController />
                         <button className="btn" onClick={handleLogout}>Logout</button>
                     </div>
