@@ -22,8 +22,8 @@ const AuthPage: FC = () => {
     password: ''
   });
   const [loginInfo, setLoginInfo] = useState<LoginInterface>({
-    emailId: 'kartik@gmail.com',
-    password: 'Kartik@123'
+    emailId: '',
+    password: ''
   });
 
   const [alertInfo, setAlertInfo] = useState<{
