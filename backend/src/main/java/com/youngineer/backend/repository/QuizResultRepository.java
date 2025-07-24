@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
     List<QuizResult> findAllByUserAndQuiz(User user, Quiz quiz);
+    Boolean existsQuizResultsByUserAndQuiz(User user, Quiz quiz);
 }

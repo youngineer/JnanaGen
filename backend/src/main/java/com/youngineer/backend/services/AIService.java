@@ -2,5 +2,5 @@ package com.youngineer.backend.services;
 
 
 public interface AIService {
-    public String getAiResponse(String chatRequest);
+    String getAiResponse(String chatRequest);
 }

@@ -8,7 +8,6 @@ import com.youngineer.backend.utils.JwtHelper;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -19,14 +18,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/auth")
 public class AuthController {
 
@@ -70,7 +67,7 @@ public class AuthController {
             if (authentication.isAuthenticated()) {
                 String accessToken = JwtHelper.generateToken(request.emailId());
 
-                ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
+                ResponseCookie cookie = ResponseCookie.from("token", accessToken)
                         .httpOnly(true)
                         .secure(false)
                         .path("/")

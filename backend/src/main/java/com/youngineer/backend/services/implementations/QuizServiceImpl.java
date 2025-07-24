@@ -8,12 +8,14 @@ import com.youngineer.backend.models.*;
 import com.youngineer.backend.repository.*;
 import com.youngineer.backend.services.QuizService;
 import com.youngineer.backend.utils.Constants;
+import com.youngineer.backend.utils.ResponseUtil;
 import jakarta.persistence.EntityNotFoundException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +46,9 @@ public class QuizServiceImpl implements QuizService {
     }
 
 
-    public ResponseDto generateQuiz(String emailId, QuizRequest generateQuizRequest) {
+    @Override
+    @Transactional
+    public ResponseEntity<ResponseDto> generateQuiz(String emailId, QuizRequest generateQuizRequest) {
         String prompt = Constants.BASE_PROMPT;
         prompt += "\nUser notes: " + generateQuizRequest.userNotes();
         prompt += "\nAdditional notes: " + generateQuizRequest.additionalContext();
@@ -57,16 +61,192 @@ public class QuizServiceImpl implements QuizService {
 
             String aiResponse = this.aiService.getAiResponse(prompt);
             JSONObject quizResponse = extractFirstJsonObject(aiResponse);
-            Quiz quiz = storeToDb(quizResponse, user.getId());
-            QuizResponse quizDto = convertToQuizDto(quiz);
-            return new ResponseDto("OK", quizDto);
+            Long quizId = storeToDb(quizResponse, user.getId());
+//            QuizResponse quizDto = convertToQuizDto(quiz);
+
+            return ResponseUtil.success("Quiz generated successfully", quizId);
+
+        } catch (EntityNotFoundException e) {
+            logger.error("Entity not found: {}", e.getMessage());
+            return ResponseUtil.notFound(e.getMessage());
+        } catch (JSONException e) {
+            logger.error("JSON parsing error: {}", e.getMessage());
+            return ResponseUtil.internalServerError("Error parsing AI response: "+ e.getMessage());
         } catch (Exception e) {
-            return new ResponseDto("Error creating user: " + e, null);
+            logger.error("Unexpected error: {}", e.getMessage());
+            return ResponseUtil.internalServerError("Error creating quiz: " + e.getMessage());
         }
     }
 
 
-    private Quiz storeToDb(JSONObject response, Long userId) {
+    public ResponseEntity<ResponseDto> loadQuiz(String emailId, Long quizId) {
+        try {
+            User user = userRepository.findByEmailId(emailId)
+                    .orElseThrow(() -> new EntityNotFoundException("User with email: " + emailId + " does not exist"));
+
+            Quiz quiz = quizRepository.findById(quizId)
+                    .orElseThrow(() -> new EntityNotFoundException("Quiz with id: " +quizId + " does not exist"));
+
+            if(user != quiz.getUser()) throw new IllegalCallerException("Unauthorized request");
+
+            return ResponseUtil.success("Quiz retrieved successfully!", convertToQuizDto(quiz));
+
+
+        } catch (EntityNotFoundException e) {
+            logger.error("Entity not found: {}", e.getMessage());
+            return ResponseUtil.notFound("Quiz or User not found");
+        } catch (Exception e) {
+            logger.error("Unexpected error: {}", e.getMessage());
+            return ResponseUtil.internalServerError("Error calculating score: " + e.getMessage());
+        }
+    }
+
+    public ResponseEntity<ResponseDto> isQuizResultGenerated(String emailId, Long quizId) {
+        try {
+            User user = userRepository.findByEmailId(emailId)
+                    .orElseThrow(() -> new EntityNotFoundException("User with email: " + emailId + " does not exist"));
+
+            Quiz quiz = quizRepository.findById(quizId)
+                    .orElseThrow(() -> new EntityNotFoundException("Quiz with id: " +quizId + " does not exist"));
+
+            if(user != quiz.getUser()) throw new IllegalCallerException("Unauthorized request");
+
+            if(!quizResultRepository.existsQuizResultsByUserAndQuiz(user, quiz)) {
+                return ResponseUtil.success("Quiz not attempted", "/quiz/" + quizId);
+            } else {
+                return ResponseUtil.success("Quiz attempted", "/quizInfo/" + quizId);
+            }
+
+        } catch (EntityNotFoundException e) {
+            logger.error("Entity not found: {}", e.getMessage());
+            return ResponseUtil.notFound("Quiz or User not found");
+        } catch (Exception e) {
+            logger.error("Unexpected error: {}", e.getMessage());
+            return ResponseUtil.internalServerError("Error calculating score: " + e.getMessage());
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public ResponseEntity<ResponseDto> calculateScore(String emailId, QuizResultRequest request) {
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        Long quizId = request.quizId();
+        LinkedHashMap<Long, Long> userAnswersMap = request.questionOptionMap();
+
+        try {
+            Quiz quiz = quizRepository.findById(quizId)
+                    .orElseThrow(() -> new EntityNotFoundException("Quiz not found with ID: " + quizId));
+
+            User user = userRepository.findByEmailId(emailId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + emailId));
+
+            for (Map.Entry<Long, Long> entry : userAnswersMap.entrySet()) {
+                Long questionId = entry.getKey();
+                Long selectedOptionId = entry.getValue();
+
+                Question question = questionRepository.findById(questionId)
+                        .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
+
+                Option selectedOption = optionRepository.findById(selectedOptionId)
+                        .orElseThrow(() -> new EntityNotFoundException("Option not found with ID: " + selectedOptionId));
+
+                String correctAnswerText = question.getCorrectAns();
+                String userAnswerText = selectedOption.getOptionText();
+                boolean isCorrect = userAnswerText.equals(correctAnswerText);
+
+                QuizResult quizResult = new QuizResult();
+                quizResult.setUser(user);
+                quizResult.setQuiz(quiz);
+                quizResult.setQuestion(question);
+                quizResult.setSelectedOption(selectedOption);
+                quizResult.setCorrect(isCorrect);
+                quizResult.setCreatedAt(currentTime);
+                quizResult.setUpdatedAt(currentTime);
+                quizResultRepository.save(quizResult);
+            }
+
+            return ResponseUtil.success("Score calculated successfully!", "/quizInfo/" + quizId);
+
+        } catch (EntityNotFoundException e) {
+            logger.error("Entity not found: {}", e.getMessage());
+            return ResponseUtil.notFound("Quiz or User not found");
+        } catch (Exception e) {
+            logger.error("Unexpected error: {}", e.getMessage());
+            return ResponseUtil.internalServerError("Error calculating score: " + e.getMessage());
+        }
+    }
+
+
+    public ResponseEntity<ResponseDto> getQuizInfo(String emailId, QuizInfo request) {
+        Long userId = request.userId();
+        Long quizId = request.quizId();
+
+        try {
+            User user = userRepository.findByEmailId(emailId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+            Quiz quiz = quizRepository.findById(quizId)
+                    .orElseThrow(() -> new EntityNotFoundException("Quiz not found with ID: " + quizId));
+
+
+            return ResponseUtil.success("Quiz result retrieved successfully!", getResult(user, quiz).content());
+
+        } catch (EntityNotFoundException e) {
+            logger.error("Entity not found: {}", e.getMessage());
+            return ResponseUtil.notFound("User or Quiz not found");
+        } catch (IllegalCallerException e) {
+            logger.warn("Unauthorized access: {}", e.getMessage());
+            return ResponseUtil.badRequest("Unauthorized request");
+        } catch (Exception e) {
+            logger.error("Unexpected error: {}", e.getMessage());
+            return ResponseUtil.internalServerError("Error fetching quiz info: " + e.getMessage());
+        }
+    }
+
+
+    public ResponseEntity<ResponseDto> getUserDashboardData(String emailId) {
+        LinkedHashMap<Long, UserQuizDetails> userQuizDetailsMap = new LinkedHashMap<>();
+        try {
+            User user = userRepository.findByEmailId(emailId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + emailId));
+
+            List<Quiz> userQuizzes = quizRepository.findAllByUser(user, Sort.by(Sort.Direction.DESC, "updatedAt"));
+            String name = user.getName();
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+            for (Quiz quiz : userQuizzes) {
+                Long quizId = quiz.getId();
+                String title = quiz.getTitle();
+
+                Timestamp createdAt = quiz.getCreatedAt();
+                Timestamp updatedAt = quiz.getUpdatedAt();
+
+                // Format timestamps as "yyyy-MM-dd"
+                String createdFormatted = formatter.format(new Date(createdAt.getTime()));
+                String updatedFormatted = formatter.format(new Date(updatedAt.getTime()));
+
+                userQuizDetailsMap.put(quizId, new UserQuizDetails(title, createdFormatted, updatedFormatted));
+            }
+
+            HashMap<String, Object> content = new HashMap<>();
+            content.put("userName", name);
+            content.put("quizList", userQuizDetailsMap);
+
+            return ResponseUtil.success("Dashboard data fetched successfully", content);
+
+        } catch (EntityNotFoundException e) {
+            logger.error("Entity not found: {}", e.getMessage());
+            return ResponseUtil.notFound("User not found with email: " + emailId);
+        } catch (Exception e) {
+            logger.error("Unexpected error: {}", e.getMessage());
+            return ResponseUtil.internalServerError("Error fetching user dashboard data: " + e.getMessage());
+        }
+    }
+
+
+    private Long storeToDb(JSONObject response, Long userId) {
         if (!response.has("title") || !response.has("quiz")) {
             logger.error("Invalid JSON response: missing title or quiz array");
             throw new IllegalArgumentException("Invalid quiz response format");
@@ -117,112 +297,10 @@ public class QuizServiceImpl implements QuizService {
             quiz.getQuestions().add(question);
         }
 
-        return quizRepository.save(quiz);
+//        return quizRepository.save(quiz);
+            Quiz generatedQuiz = quizRepository.save(quiz);
+        return generatedQuiz.getId();
     }
-
-
-    @Override
-    @Transactional
-    public ResponseDto calculateScore(String emailId, QuizResultRequest request) {
-        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        Long quizId = request.quizId();
-        LinkedHashMap<Long, Long> userAnswersMap = request.questionOptionMap();
-
-        try {
-            Quiz quiz = quizRepository.findById(quizId)
-                    .orElseThrow(() -> new EntityNotFoundException("Quiz not found with ID: " + quizId));
-
-            User user = userRepository.findByEmailId(emailId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + emailId));
-
-            for (Map.Entry<Long, Long> entry : userAnswersMap.entrySet()) {
-                Long questionId = entry.getKey();
-                Long selectedOptionId = entry.getValue();
-
-                Question question = questionRepository.findById(questionId)
-                        .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
-
-                Option selectedOption = optionRepository.findById(selectedOptionId)
-                        .orElseThrow(() -> new EntityNotFoundException("Option not found with ID: " + selectedOptionId));
-
-                String correctAnswerText = question.getCorrectAns();
-                String userAnswerText = selectedOption.getOptionText();
-                boolean isCorrect = userAnswerText.equals(correctAnswerText);
-
-                QuizResult quizResult = new QuizResult();
-                quizResult.setUser(user);
-                quizResult.setQuiz(quiz);
-                quizResult.setQuestion(question);
-                quizResult.setSelectedOption(selectedOption);
-                quizResult.setCorrect(isCorrect);
-                quizResult.setCreatedAt(currentTime);
-                quizResult.setUpdatedAt(currentTime);
-                quizResultRepository.save(quizResult);
-            }
-
-            return getResult(user, quiz);
-
-        } catch (Exception ex) {
-            return new ResponseDto("Error calculating score: " + ex.getMessage(), null);
-        }
-    }
-
-
-    public ResponseDto getQuizInfo(String emailId, QuizInfo request) {
-        Long userId = request.userId();
-        Long quizId = request.quizId();
-
-        try {
-            User user = userRepository.findByEmailId(emailId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
-
-            Quiz quiz = quizRepository.findById(quizId)
-                    .orElseThrow(() -> new EntityNotFoundException("Quiz not found with ID: " + quizId));
-
-            return getResult(user, quiz);
-        } catch (Exception ex) {
-            return new ResponseDto(ex.getMessage(), null);
-        }
-    }
-
-
-    public ResponseDto getUserDashboardData(String emailId) {
-        LinkedHashMap<Long, UserQuizDetails> userQuizDetailsMap = new LinkedHashMap<>();
-        try {
-            User user = userRepository.findByEmailId(emailId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + emailId));
-
-            List<Quiz> userQuizzes = quizRepository.findAllByUser(user, Sort.by(Sort.Direction.DESC, "updatedAt"));
-            String name = user.getName();
-
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
-            for (Quiz quiz : userQuizzes) {
-                Long quizId = quiz.getId();
-                String title = quiz.getTitle();
-
-                Timestamp createdAt = quiz.getCreatedAt();
-                Timestamp updatedAt = quiz.getUpdatedAt();
-
-                // Format timestamps as "yyyy-MM-dd"
-                String createdFormatted = formatter.format(new Date(createdAt.getTime()));
-                String updatedFormatted = formatter.format(new Date(updatedAt.getTime()));
-
-                userQuizDetailsMap.put(quizId, new UserQuizDetails(title, createdFormatted, updatedFormatted));
-            }
-
-            HashMap<String, Object> content = new HashMap<>();
-            content.put("userName", name);
-            content.put("quizList", userQuizDetailsMap);
-
-            return new ResponseDto("OK", content);
-
-        } catch (Exception ex) {
-            return new ResponseDto("Error(EntityNotFoundException) occurred while fetching from db: " + ex.getMessage(), null);
-        }
-    }
-
-
 
     private ResponseDto getResult(User user, Quiz quiz) {
         LinkedHashMap<Long, AnswerEvaluation> evaluationMap = new LinkedHashMap<>();
@@ -295,31 +373,55 @@ public class QuizServiceImpl implements QuizService {
 
 }
 
-//    private JSONObject getQuizFromAi(String prompt) {
-//        try {
-//            RestTemplate restTemplate = new RestTemplate();
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.APPLICATION_JSON);
-//            headers.set("Authorization", "Bearer " + apiKey);
-//
-//            JSONObject jsonPayload = new JSONObject();
-//            jsonPayload.put("model", model);
-//            jsonPayload.put("prompt", prompt);
-//
-//            HttpEntity<String> request = new HttpEntity<>(jsonPayload.toString(), headers);
-//            ResponseEntity<String> response = restTemplate.postForEntity(apiEndpoint, request, String.class);
-//
-//            JSONObject jsonResponse = new JSONObject(response.getBody());
-//            JSONArray choices = jsonResponse.getJSONArray("choices");
-//            String text = choices.getJSONObject(0).getString("text").trim();
-//            String quizText = extractFirstJsonObject(text);
-//            JSONObject quizJson = new JSONObject(quizText);
-//
-//
-//            return quizJson;
-//        } catch (HttpClientErrorException e) {
-//            logger.error("API error for prompt: {}", prompt, e);
-//            throw new RuntimeException("Failed to fetch quiz from AI service", e);
-//        }
-//    }
-//}
+
+/*
+@Override
+    @Transactional
+    public ResponseEntity<ResponseDto> calculateScore(String emailId, QuizResultRequest request) {
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        Long quizId = request.quizId();
+        LinkedHashMap<Long, Long> userAnswersMap = request.questionOptionMap();
+
+        try {
+            Quiz quiz = quizRepository.findById(quizId)
+                    .orElseThrow(() -> new EntityNotFoundException("Quiz not found with ID: " + quizId));
+
+            User user = userRepository.findByEmailId(emailId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + emailId));
+
+            for (Map.Entry<Long, Long> entry : userAnswersMap.entrySet()) {
+                Long questionId = entry.getKey();
+                Long selectedOptionId = entry.getValue();
+
+                Question question = questionRepository.findById(questionId)
+                        .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
+
+                Option selectedOption = optionRepository.findById(selectedOptionId)
+                        .orElseThrow(() -> new EntityNotFoundException("Option not found with ID: " + selectedOptionId));
+
+                String correctAnswerText = question.getCorrectAns();
+                String userAnswerText = selectedOption.getOptionText();
+                boolean isCorrect = userAnswerText.equals(correctAnswerText);
+
+                QuizResult quizResult = new QuizResult();
+                quizResult.setUser(user);
+                quizResult.setQuiz(quiz);
+                quizResult.setQuestion(question);
+                quizResult.setSelectedOption(selectedOption);
+                quizResult.setCorrect(isCorrect);
+                quizResult.setCreatedAt(currentTime);
+                quizResult.setUpdatedAt(currentTime);
+                quizResultRepository.save(quizResult);
+            }
+
+            return ResponseUtil.success("Score calculated successfully!", getResult(user, quiz).content());
+
+        } catch (EntityNotFoundException e) {
+            logger.error("Entity not found: {}", e.getMessage());
+            return ResponseUtil.notFound("Quiz or User not found");
+        } catch (Exception e) {
+            logger.error("Unexpected error: {}", e.getMessage());
+            return ResponseUtil.internalServerError("Error calculating score: " + e.getMessage());
+        }
+    }
+ */
