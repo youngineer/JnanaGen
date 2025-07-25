@@ -8,15 +8,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${frontend.url")
+    @Value("${frontend.url}")
     private String frontendUrl;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        System.out.println(frontendUrl);
         registry.addMapping("/**")
                 .allowedOrigins(frontendUrl)
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Add OPTIONS
+                .allowedHeaders("*") // Add this
                 .allowCredentials(true);
     }
 }
