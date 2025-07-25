@@ -1,10 +1,5 @@
+import type { AlertMessageInterface } from "../utils/interfaces";
 
-
-
-interface AlertMessageInterface {
-    isSuccess: boolean,
-    message: string
-}
 
 const AlertMessage = ({isSuccess, message}: AlertMessageInterface) => {
   return (

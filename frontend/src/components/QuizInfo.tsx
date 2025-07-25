@@ -4,7 +4,6 @@ import type { Evaluation } from '../utils/interfaces';
 import { useNavigate } from 'react-router';
 
 
-
 const QuizInfo: FC = () => {
   const [quiz, setQuiz] = useState<Evaluation>([]);
   const [title, setTitle] = useState<string>("");
@@ -12,7 +11,7 @@ const QuizInfo: FC = () => {
   const [percentage, setPercentage] = useState<number>(-1);
   const navigate = useNavigate()
 
-  const path = location.pathname;
+  const path: string = location.pathname;
 
   useEffect(() => {
     const getQuiz = async () => {
@@ -26,7 +25,6 @@ const QuizInfo: FC = () => {
 
       } catch (err) {
         setQuiz([]);
-
       } 
     }
 
@@ -39,8 +37,6 @@ const QuizInfo: FC = () => {
   if(score === undefined) {
     navigate('/quiz');
   }
-
-  console.log(score);
 
 
   return (

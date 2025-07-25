@@ -74,3 +74,9 @@ export interface ScorePayload {
     userAnswerList: string[],
     questionOptionMap: Record<number, number>
 }
+
+
+export interface AlertMessageInterface {
+    isSuccess: boolean,
+    message: string
+}

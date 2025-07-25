@@ -16,7 +16,7 @@ const QuizPage: FC = () => {
     const quizId = location.slice(location.lastIndexOf('/') + 1);
 
     useEffect(() => {
-        const fetchQuiz = async () => {
+        const fetchQuiz = async (): Promise<void> => {
             setLoading(true);
             setError(null);
             try {
@@ -82,7 +82,6 @@ const QuizPage: FC = () => {
           question.options.forEach(opt => {
             if(opt.option === answer) {
               questionOptionMap[question.id] = opt.id
-              console.log(opt.id)
             };
           })
           userAnswerList.push(answer);
@@ -94,10 +93,8 @@ const QuizPage: FC = () => {
             questionOptionMap
         };
 
-        console.log(payload);
         try {
           const path = await calculateScore(payload);
-          console.log(path);
           navigate(path);
         } catch (err) {
             setError("Failed to load quiz.");

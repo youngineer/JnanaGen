@@ -1,4 +1,3 @@
-
 import { BASE_QUIZ_URL, MY_HEADER } from "../utils/constants"
 import type { AttemptedQuizInfo, Quiz, QuizDetails, QuizInfoProps, QuizSpecification, ScorePayload } from "../utils/interfaces";
 
@@ -33,7 +32,6 @@ export const generateQuiz = async(userInput: QuizSpecification): Promise<void> =
 
 export const loadQuiz = async(id: string): Promise<Quiz> => {
     const url = BASE_QUIZ_URL + "/loadQuiz/" + id;
-    console.log(url)
     const request = new Request(url, {
         method: "GET",
         headers: MY_HEADER,
@@ -50,7 +48,6 @@ export const loadQuiz = async(id: string): Promise<Quiz> => {
                 data?.message || "Error generating the quiz"
             });
         } else {
-            console.log(data?.content)
             return data?.content;
         }
     } catch (error) {
@@ -78,7 +75,6 @@ export const fetchUserQuizList = async(): Promise<QuizDetails> => {
                 data?.message || "Could not fetch user quizzes";
             });
         } else {
-            console.log(data?.content);
             return data?.content?.quizList;
         }
     } catch (error) {

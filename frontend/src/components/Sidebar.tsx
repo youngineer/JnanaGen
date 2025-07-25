@@ -16,7 +16,7 @@ const Sidebar: FC = (): JSX.Element => {
   });
 
   useEffect(() => {
-    const fetchQuizzes = async() => {
+    const fetchQuizzes = async():Promise<void> => {
       try {
         const quizzes = await fetchUserQuizList();
         setQuizList(quizzes);
@@ -36,7 +36,6 @@ const Sidebar: FC = (): JSX.Element => {
     try {
       const path = await getRedirectionPath(id);
       if (path) {
-        console.log(path);
         navigate(path, { replace: true });
       } else {
         setAlert({

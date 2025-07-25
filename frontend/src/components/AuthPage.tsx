@@ -2,28 +2,19 @@ import { useState, type ChangeEvent, type FormEvent, type FC } from "react"
 import { handleLogin, handleSignup } from "../services/authServices";
 import AlertMessage from "./AlertMessage";
 import { useNavigate } from "react-router";
+import type { AuthCredentials, SignupCredentials } from "../utils/interfaces";
 
-interface SignupInterface {
-  name: string;
-  emailId: string;
-  password: string;
-}
-
-interface LoginInterface {
-  emailId: string;
-  password: string;
-}
 
 const AuthPage: FC = () => {
   const [isLogin, setIsLogin] = useState<boolean>(false);
-  const [signupInfo, setSignupInfo] = useState<SignupInterface>({
+  const [signupInfo, setSignupInfo] = useState<SignupCredentials>({
     name: '',
     emailId: '',
     password: ''
   });
-  const [loginInfo, setLoginInfo] = useState<LoginInterface>({
-    emailId: '',
-    password: ''
+  const [loginInfo, setLoginInfo] = useState<AuthCredentials>({
+    emailId: 'kartik@gmail.com',
+    password: 'Kartik@123'
   });
 
   const [alertInfo, setAlertInfo] = useState<{

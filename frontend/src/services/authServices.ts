@@ -50,3 +50,53 @@ export const handleSignup = async (signupData: SignupCredentials): Promise<strin
         return Promise.reject('Network error. Please check your connection.');
     }
 };
+
+
+export const checkAuthenticated = async(): Promise<boolean> => {
+    const url = BASE_AUTH_URL + "/checkAuth";
+    const request = new Request(url, {
+        method: "GET",
+        headers: MY_HEADER,
+        credentials: "include"
+    });
+
+    try {
+        const response = await fetch(request);
+        const data = await response.json();
+
+        if(!response.ok) {
+            return Promise.reject(() => {
+                data?.content || data?.message || "Not authenticated";
+            })
+        } else {
+            return data?.content;
+        }
+    } catch (error) {
+        return Promise.reject('Network error. Please check your connection.');
+    }
+};
+
+
+export const logout = async(): Promise<string> => {
+    const url = BASE_AUTH_URL + "/logout";
+    const request = new Request(url, {
+        method:"GET",
+        headers: MY_HEADER,
+        credentials: "include"
+    });
+
+    try {
+        const response = await fetch(request);
+        const data = await response.json();
+
+        if(!response.ok) {
+            return Promise.reject(() => {
+                data?.content || data?.message || "Not authenticated";
+            })
+        } else {
+            return data?.content;
+        }
+    } catch (error) {
+        return Promise.reject('Network error. Please check your connection.');
+    }
+}
