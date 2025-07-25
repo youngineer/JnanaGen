@@ -62,7 +62,6 @@ public class QuizServiceImpl implements QuizService {
             String aiResponse = this.aiService.getAiResponse(prompt);
             JSONObject quizResponse = extractFirstJsonObject(aiResponse);
             Long quizId = storeToDb(quizResponse, user.getId());
-//            QuizResponse quizDto = convertToQuizDto(quiz);
 
             return ResponseUtil.success("Quiz generated successfully", quizId);
 
