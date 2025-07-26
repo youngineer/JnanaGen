@@ -34,7 +34,7 @@ const QuizPage: FC = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-64">
+            <div className="blur-sm flex justify-center items-center h-64">
                 <span className="loading loading-spinner loading-lg"></span>
             </div>
         );
@@ -71,7 +71,6 @@ const QuizPage: FC = () => {
     };
 
     const handleSubmit = async(): Promise<void> => {
-        // Build questionOptionMap and userAnswerList
         const userAnswerList: string[] = [];
         const questionOptionMap: Record<number, number> = {};
 
@@ -110,8 +109,8 @@ const QuizPage: FC = () => {
             <div className="mb-6">
                 <progress 
                     className="progress w-56 mx-1" 
-                    value={currentQuestionIndex + 1} 
-                    max={totalQuestions}>
+                    value={currentQuestionIndex} 
+                    max={totalQuestions - 1}>
                 </progress>
                 <span className="ml-2">
                     {currentQuestionIndex + 1} out of {totalQuestions}

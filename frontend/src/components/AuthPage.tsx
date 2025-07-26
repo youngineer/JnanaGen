@@ -13,8 +13,8 @@ const AuthPage: FC = () => {
     password: ''
   });
   const [loginInfo, setLoginInfo] = useState<AuthCredentials>({
-    emailId: 'kartik@gmail.com',
-    password: 'Kartik@123'
+    emailId: '',
+    password: ''
   });
 
   const [alertInfo, setAlertInfo] = useState<{
@@ -65,6 +65,12 @@ const AuthPage: FC = () => {
           emailId: '',
           password: ''
         });
+
+        setAlertInfo({
+          show: true,
+          isSuccess: true,
+          message: message
+        })
 
         setIsLogin(true);
       }

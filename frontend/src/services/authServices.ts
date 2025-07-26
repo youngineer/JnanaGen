@@ -44,7 +44,7 @@ export const handleSignup = async (signupData: SignupCredentials): Promise<strin
                 'Registration failed. Please try again.'
             );
         } else {
-            return "Registration successful! Please login";
+            return "Signup successful! Please login";
         }
     } catch (error) {
         return Promise.reject('Network error. Please check your connection.');

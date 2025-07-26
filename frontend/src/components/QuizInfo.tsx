@@ -45,7 +45,7 @@ const QuizInfo: FC = () => {
         <div className="text-xl flex justify-center items-center gap-4 mb-4">
         <h3>Score:</h3>
         <div
-          className="radial-progress text-primary"
+          className="radial-progress p-0.5"
           style={{ "--value": percentage } as React.CSSProperties}
           aria-valuenow={percentage}
           role="progressbar"
@@ -56,12 +56,19 @@ const QuizInfo: FC = () => {
       
       {
         Object.entries(quiz).map(([id, data]) => (
-          <div key={id} className="card bg-primary text-primary-content w-auto">
+          <div
+            key={id}
+            className={`card w-auto ${
+              data.isCorrect
+                ? 'bg-success text-success-content'
+                : 'bg-error text-error-content'
+            }`}
+          >
             <div className="card-body">
               <h2 className="card-title">Q. {data.question}</h2>
               <h4>Your answer: {data.userAnswer}</h4>
               <h4>Correct answer: {data.correctAnswer}</h4>
-              <h3 className='text-success-content'>Explanation: {data.explanation}</h3>
+              <h3 className='text-accent-content'>Explanation: {data.explanation}</h3>
             </div>
           </div>
         ))

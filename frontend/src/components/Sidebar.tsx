@@ -54,34 +54,35 @@ const Sidebar: FC = (): JSX.Element => {
   };
 
   return (
-    <>
-      <details open className='mx-4'>
-        <summary className='font-bold '>Your Quizzes</summary>
-        <ul className='flex flex-col gap-1'>
-          {
-            Object.entries(quizList).map(([id, quiz]) => (
-              <li key={id} className="w-full">
-                <div className="tooltip tooltip-right tooltip-warning w-full" data-tip={quiz.title}>
-                  <button
-                    className="btn btn-soft-content w-full px-2 py-1 rounded hover:btn-soft transition"
-                    style={{ wordBreak: 'break-word' }}
-                    onClick={() => handleQuizRedirect(id)}
-                  >
+  <>
+    <details open={false} className='mx-4'>
+      <summary className='font-bold cursor-pointer border-1 p-2 rounded-lg shadow-2xs'>Your Quizzes</summary>
+      <ul className='flex flex-col gap-1 max-w-96'>
+        {
+          Object.entries(quizList).map(([id, quiz]) => (
+            <li key={id} className="">
+              <div className="tooltip tooltip-right w-full tooltip-warning" data-tip={quiz.title}>
+                <button
+                  className="btn btn-soft-content px-2 py-1 rounded hover:btn-soft transition w-full text-left"
+                  onClick={() => handleQuizRedirect(id)}
+                >
+                  <span className="block truncate max-w-full">
                     {quiz.title}
-                  </button>
-                </div>
-              </li>
-            ))
-          }
-        </ul>
-      </details>
-      {alert.show && (
-        <div className={`alert ${alert.isSuccess ? 'alert-success' : 'alert-error'} mt-4`}>
-          {alert.message}
-        </div>
-      )}
-    </>
-  )
+                  </span>
+                </button>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </details>
+    {alert.show && (
+      <div className={`alert ${alert.isSuccess ? 'alert-success' : 'alert-error'} mt-4`}>
+        {alert.message}
+      </div>
+    )}
+  </>
+)
 }
 
 export default Sidebar;
