@@ -1,5 +1,4 @@
-# JnanaGen - AI-Powered Quiz Generator
-- Live Demo: https://jnana-gen.netlify.app/
+# JnanaGen - AI-Powered Quiz Generator Live link: https://jnana-gen.netlify.app/
 A full-stack web application that automatically generates intelligent quizzes from user-provided notes using AI technology. The system leverages Spring AI with OpenAI integration to create customized quizzes with multiple-choice questions, explanations, and detailed scoring analysis.
 
 ## Project Overview
