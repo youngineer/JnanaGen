@@ -1,4 +1,8 @@
 ## **JnanaGen** 🧠: [See it in action](https://jnana-gen.netlify.app/)
+## 🎥 Demo Video
+
+[![Watch the video](./demo_thumb.png)](https://drive.google.com/file/d/1-zfWwg3NjfN6OgWPcDGwjoi5RrhG9ER2/view?usp=drive_link)
+
 ### A full-stack web application that automatically generates intelligent quizzes from user-provided notes using AI technology. The system leverages Spring AI with OpenAI integration to create customized quizzes with multiple-choice questions, explanations, and scoring analysis.
 
 ## Project Overview
